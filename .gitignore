@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+.venv/
+.rastro/
+*.sqlite3
+*.sqlite3-*
+/demo/
+/relatorio*.html
+/resultado*.json
+/dist/
+*.egg-info/
+/docs/qa-*.html

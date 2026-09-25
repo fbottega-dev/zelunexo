@@ -1,0 +1,89 @@
+import contextlib
+import io
+import json
+from pathlib import Path
+import tempfile
+import unittest
+from unittest.mock import patch
+
+from rastro.cli import main, terminal_text
+from rastro.storage import list_scans
+
+
+class CliTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name)
+        self.demo = self.root / "acervo"
+        self.db = self.root / "historico.sqlite3"
+
+    def call(self, *args):
+        output, errors = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(output), contextlib.redirect_stderr(errors):
+            code = main([str(arg) for arg in args])
+        return code, output.getvalue(), errors.getvalue()
+
+    def test_full_flow_demo_scan_history_html_json(self):
+        self.assertEqual(self.call("demo", self.demo)[0], 0)
+        before = {p.relative_to(self.demo): p.read_bytes() for p in self.demo.rglob("*") if p.is_file()}
+        report = self.root / "resultado.html"
+        code, output, _ = self.call("analisar", self.demo, "--banco", self.db, "--html", report)
+        self.assertEqual(code, 0)
+        self.assertIn("4 grupos", output)
+        self.assertIn("<!doctype html>", report.read_text(encoding="utf-8").lower())
+        self.assertIn("#1", self.call("historico", "--banco", self.db)[1])
+        exported = self.root / "resultado.json"
+        self.assertEqual(self.call("exportar", 1, "--banco", self.db, "--saida", exported, "--formato", "json")[0], 0)
+        data = json.loads(exported.read_text(encoding="utf-8"))
+        self.assertEqual(data["summary"]["duplicate_groups"], 4)
+        self.assertEqual(data["folder"], "acervo")
+        self.assertEqual(len(data["files"]), 14)
+        self.assertEqual(before, {p.relative_to(self.demo): p.read_bytes() for p in self.demo.rglob("*") if p.is_file()})
+
+    def test_refuses_existing_demo_without_changes(self):
+        self.call("demo", self.demo)
+        sentinel = self.demo / "pessoal.txt"
+        sentinel.write_text("preservar")
+        self.assertEqual(self.call("demo", self.demo)[0], 2)
+        self.assertEqual(sentinel.read_text(), "preservar")
+
+    def test_refuses_database_or_report_inside_source(self):
+        self.call("demo", self.demo)
+        self.assertEqual(self.call("analisar", self.demo, "--banco", self.demo / "novo.db")[0], 2)
+        self.assertEqual(self.call("analisar", self.demo, "--banco", self.db, "--html", self.demo / "novo.html")[0], 2)
+        self.assertFalse(self.db.exists())
+
+    def test_never_overwrites_report_and_preflights_before_scan(self):
+        self.call("demo", self.demo)
+        report = self.root / "pessoal.html"
+        report.write_text("preservar")
+        self.assertEqual(self.call("analisar", self.demo, "--banco", self.db, "--html", report)[0], 2)
+        self.assertFalse(self.db.exists())
+        self.assertEqual(report.read_text(), "preservar")
+
+    def test_partial_scan_is_persisted_but_exit_is_three(self):
+        self.demo.mkdir()
+        with patch("rastro.scanner.digest_file", side_effect=PermissionError("Sem acesso")):
+            (self.demo / "a.txt").write_text("arquivo")
+            code, output, errors = self.call("analisar", self.demo, "--banco", self.db)
+        self.assertEqual(code, 3)
+        self.assertIn("PARCIAL", output)
+        self.assertIn("Sem acesso", errors)
+        self.assertEqual(list_scans(self.db)[0]["issues_count"], 1)
+
+    def test_missing_folder_returns_clear_error_without_database(self):
+        self.assertEqual(self.call("analisar", self.demo, "--banco", self.db)[0], 2)
+        self.assertFalse(self.db.exists())
+
+    def test_export_missing_id_is_error(self):
+        self.call("demo", self.demo)
+        self.call("analisar", self.demo, "--banco", self.db)
+        self.assertEqual(self.call("exportar", 99, "--banco", self.db, "--saida", self.root / "x.html")[0], 2)
+
+    def test_terminal_controls_are_escaped(self):
+        self.assertEqual(terminal_text("ação\x1b[31m\n"), "ação\\u001b[31m\\u000a")
+
+
+if __name__ == "__main__":
+    unittest.main()
