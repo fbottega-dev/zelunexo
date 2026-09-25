@@ -1,0 +1,1700 @@
+<!doctype html>
+<html lang="pt-BR">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light"><meta name="description" content="Relatório local de arquivos duplicados, gerado pelo Rastro.">
+<title>Rastro — demo</title><style>:root {
+  --paper: #f6f5f1;
+  --white: #fff;
+  --ink: #292d2b;
+  --muted: #626862;
+  --line: #dddeda;
+  --accent: #c95235;
+  --peach: #f3dbcc;
+  --sidebar: #242b28;
+  --sans:
+    Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  --mono: ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+* {
+  box-sizing: border-box;
+}
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 30px;
+}
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.6;
+}
+button,
+input,
+select {
+  font: inherit;
+}
+button,
+a,
+input,
+select,
+summary {
+  -webkit-tap-highlight-color: transparent;
+}
+a {
+  color: inherit;
+}
+button {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+summary:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 4px;
+}
+button,
+input,
+select {
+  border-radius: 6px;
+}
+button {
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+[hidden] {
+  display: none !important;
+}
+.skip-link {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  padding: 12px 20px;
+  background: #fff;
+  z-index: 10;
+  transform: translateY(-180%);
+}
+.skip-link:focus {
+  transform: none;
+}
+.sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: 234px;
+  padding: 39px 25px 28px;
+  color: #f7f4ec;
+  background: var(--sidebar);
+  display: flex;
+  flex-direction: column;
+}
+.brand {
+  display: flex;
+  gap: 11px;
+  align-items: center;
+  text-decoration: none;
+  line-height: 1;
+}
+.brand svg {
+  width: 35px;
+  height: 35px;
+  color: #edaa8e;
+  stroke-width: 2;
+}
+.brand > span {
+  font-size: 32px;
+  font-weight: 650;
+  letter-spacing: -1.7px;
+}
+.brand-dot {
+  color: #edaa8e;
+}
+.brand-caption {
+  font-size: 11px;
+  color: #b1b9b2;
+  margin-top: 15px;
+}
+.nav-caption {
+  font-size: 9px;
+  font-weight: 650;
+  color: #abb4ad;
+  letter-spacing: 1.6px;
+  margin: 51px 12px 16px;
+}
+.sidebar nav {
+  display: grid;
+  gap: 5px;
+}
+.sidebar nav a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 12px;
+  border-radius: 5px;
+  text-decoration: none;
+  font-size: 12px;
+  color: #d4dad4;
+}
+.sidebar nav a:first-child {
+  background: #3b443d;
+  color: #fff;
+}
+.sidebar nav a:hover {
+  background: #414a43;
+  color: #fff;
+}
+.sidebar nav a > span:first-child {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: #a6b0a7;
+}
+.sidebar nav svg {
+  margin-left: auto;
+  width: 16px;
+  height: 16px;
+}
+.sidebar nav .nav-count {
+  margin-left: auto;
+  border-radius: 4px;
+  background: #424b44;
+  min-width: 23px;
+  text-align: center;
+  font-size: 10px;
+}
+.sidebar-folder {
+  margin-top: 43px;
+  padding: 20px 13px;
+  border-top: 1px solid #485149;
+  border-bottom: 1px solid #485149;
+}
+.sidebar-folder > span {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 1.4px;
+  color: #abb4ad;
+}
+.sidebar-folder strong {
+  display: block;
+  font-weight: 500;
+  font-size: 13px;
+  margin: 8px 0;
+  overflow-wrap: anywhere;
+}
+.sidebar-folder p {
+  font-size: 11px;
+  line-height: 1.7;
+  color: #abb4ad;
+}
+.sidebar-footer {
+  margin-top: auto;
+  padding: 28px 12px 0;
+  font-size: 10px;
+}
+.sidebar-footer strong {
+  font-weight: 500;
+}
+.sidebar-footer p {
+  color: #abb4ad;
+  padding-left: 13px;
+  margin-top: 5px;
+}
+.offline-dot {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #c0d1a8;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+main {
+  max-width: 1660px;
+  margin-left: 234px;
+  padding: 0 54px 0;
+}
+.topbar {
+  min-height: 85px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+  gap: 15px;
+}
+.topbar > span {
+  font-size: 9px;
+  letter-spacing: 1.8px;
+  color: var(--muted);
+  font-weight: 650;
+}
+.print-button {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  background: transparent;
+  border: 1px solid var(--line);
+  padding: 8px 12px;
+  color: var(--muted);
+  font-size: 11px;
+  white-space: nowrap;
+}
+.print-button:hover {
+  background: #eaeae4;
+}
+.print-button svg {
+  width: 14px;
+  height: 14px;
+}
+.hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 35px;
+  padding: 48px 0 35px;
+}
+.eyebrow {
+  font-size: 9px;
+  font-weight: 650;
+  letter-spacing: 1.7px;
+  color: var(--muted);
+  margin-bottom: 15px;
+}
+h1 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 400;
+  font-size: clamp(42px, 4.6vw, 65px);
+  line-height: 1.06;
+  letter-spacing: -2px;
+}
+h1 em {
+  font-weight: 400;
+  color: var(--accent);
+}
+.hero-description {
+  font-size: 12px;
+  line-height: 1.9;
+  color: var(--muted);
+  margin-top: 20px;
+}
+.analysis-meta {
+  max-width: 300px;
+  min-width: 175px;
+  align-self: center;
+  padding-top: 5px;
+}
+.status {
+  display: inline-flex;
+  gap: 7px;
+  align-items: center;
+  font-size: 10px;
+  line-height: 1.3;
+  color: #48604b;
+  background: #e7ebe1;
+  border: 1px solid #d6decf;
+  border-radius: 30px;
+  padding: 7px 10px;
+  margin-bottom: 23px;
+}
+.status > span {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+.status-partial {
+  color: #944a26;
+  background: #fae5d1;
+  border-color: #eacbab;
+}
+.meta-label {
+  display: block;
+  color: var(--muted);
+  font-size: 9px;
+  letter-spacing: 1.6px;
+  margin-bottom: 5px;
+}
+.analysis-meta strong {
+  display: block;
+  font-weight: 600;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+.analysis-meta time {
+  display: block;
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 5px;
+}
+.warning {
+  display: flex;
+  align-items: start;
+  gap: 13px;
+  padding: 18px 20px;
+  margin-bottom: 20px;
+  border: 1px solid #e7c6ac;
+  background: #fff0df;
+  border-radius: 7px;
+  font-size: 12px;
+  color: #764729;
+}
+.warning-symbol {
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  line-height: 19px;
+  min-width: 21px;
+  text-align: center;
+  font-weight: 700;
+}
+.warning p {
+  margin-top: 3px;
+}
+.warning a {
+  text-underline-offset: 3px;
+}
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 13px;
+}
+.metric {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 20px 19px 17px;
+}
+.metric h3 {
+  font-weight: 500;
+  font-size: 11px;
+  color: var(--muted);
+}
+.metric-value {
+  font-size: clamp(23px, 2.5vw, 35px);
+  font-weight: 500;
+  letter-spacing: -1.1px;
+  margin-top: 13px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+.metric-note {
+  font-size: 9px;
+  color: var(--muted);
+  margin-top: 6px;
+}
+.metric-accent {
+  background: var(--peach);
+  border-color: #ebc9b4;
+}
+.metric-accent .metric-value {
+  color: #913d2a;
+}
+.metric-accent h3,
+.metric-accent .metric-note {
+  color: #744635;
+}
+.volume-panel {
+  margin-top: 18px;
+  padding: 24px 25px 18px;
+  background: #eeeee8;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+}
+.volume-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+.volume-heading h2 {
+  font-size: 13px;
+  font-weight: 600;
+}
+.volume-heading p {
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+.volume-heading > strong {
+  font-size: 27px;
+  line-height: 1;
+  letter-spacing: -1px;
+  font-weight: 500;
+  text-align: right;
+  color: #97412d;
+}
+.volume-heading > strong > span {
+  font-size: 15px;
+}
+.volume-heading small {
+  display: block;
+  font-size: 9px;
+  letter-spacing: 0;
+  font-weight: 400;
+  color: var(--muted);
+  margin-top: 5px;
+}
+.volume-bar {
+  margin-top: 20px;
+  height: 12px;
+  border-radius: 4px;
+  background: #495a4b;
+  overflow: hidden;
+  display: flex;
+  justify-content: flex-end;
+}
+.volume-bar > span {
+  display: block;
+  min-width: 0;
+  background: #ce714f;
+}
+.volume-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 30px;
+  margin-top: 13px;
+  font-size: 10px;
+  color: var(--muted);
+}
+.volume-legend > span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.volume-legend i {
+  width: 7px;
+  height: 7px;
+  border-radius: 2px;
+  display: inline-block;
+}
+.legend-base {
+  background: #495a4b;
+}
+.legend-extra {
+  background: #ce714f;
+}
+.volume-legend strong {
+  font-weight: 600;
+  color: var(--ink);
+  margin-left: 7px;
+}
+.estimate-note {
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid #d7d9d1;
+}
+.duplicates-section,
+.scope-section {
+  margin-top: 47px;
+}
+.section-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 15px;
+}
+.section-heading .eyebrow {
+  margin-bottom: 9px;
+}
+.section-heading h2 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 33px;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: -0.9px;
+}
+.heading-dot {
+  color: var(--accent);
+}
+.section-badge {
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  border: 1px solid var(--line);
+  padding: 5px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  color: var(--muted);
+  margin-bottom: 3px;
+}
+.section-description {
+  font-size: 11px;
+  line-height: 1.8;
+  color: var(--muted);
+  margin-top: 12px;
+}
+.group-tools {
+  display: flex;
+  align-items: end;
+  gap: 15px;
+  margin-top: 23px;
+}
+.search-field {
+  flex: 1;
+  min-width: 0;
+}
+.search-field label,
+.select-field label {
+  display: block;
+  font-size: 10px;
+  color: var(--muted);
+  margin-bottom: 7px;
+}
+.search-input {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.search-input > svg {
+  position: absolute;
+  left: 14px;
+  width: 16px;
+  height: 16px;
+  color: #777d75;
+}
+.search-input input {
+  width: 100%;
+  height: 41px;
+  border: 1px solid #cfd3cb;
+  background: #fff;
+  padding: 0 41px 0 40px;
+  font-size: 11px;
+  color: var(--ink);
+}
+.search-input input::placeholder {
+  color: #767c74;
+  opacity: 1;
+}
+.search-input input::-webkit-search-cancel-button {
+  display: none;
+}
+.search-input button {
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  height: 31px;
+  width: 31px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 23px;
+  line-height: 1;
+}
+.search-input button:hover {
+  background: #efefea;
+}
+.select-field select {
+  height: 41px;
+  border: 1px solid #cfd3cb;
+  background: #fff;
+  padding: 0 31px 0 13px;
+  font-size: 11px;
+  color: var(--ink);
+  width: 190px;
+}
+.results-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 13px 0 12px;
+  gap: 12px;
+  font-size: 10px;
+  color: var(--muted);
+}
+.expand-buttons {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+}
+.expand-buttons button {
+  border: 0;
+  background: none;
+  padding: 5px 0;
+  font-size: 10px;
+  color: #656b63;
+}
+.expand-buttons button:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.expand-buttons > span {
+  color: #b0b6ac;
+}
+#groups {
+  margin-top: 16px;
+}
+.duplicate-group {
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #fff;
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+.duplicate-group summary {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 19px 20px;
+  list-style: none;
+  cursor: pointer;
+}
+.duplicate-group summary::-webkit-details-marker {
+  display: none;
+}
+.duplicate-group summary:hover {
+  background: #f9f9f6;
+}
+.duplicate-group summary:focus-visible {
+  outline-offset: -4px;
+}
+.group-symbol {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f0eee7;
+  border-radius: 5px;
+  width: 35px;
+  height: 38px;
+  font-size: 27px;
+  color: #798272;
+  flex-shrink: 0;
+  line-height: 1;
+}
+.group-heading {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.group-name {
+  font-size: 12px;
+  font-weight: 600;
+}
+.group-description {
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+.group-potential {
+  display: flex;
+  flex-direction: column;
+  text-align: right;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+.group-potential strong {
+  font-size: 12px;
+  font-weight: 600;
+  color: #a14730;
+}
+.group-potential > span {
+  font-size: 9px;
+  color: var(--muted);
+}
+.chevron {
+  display: block;
+  width: 7px;
+  height: 7px;
+  border-right: 1.5px solid var(--muted);
+  border-bottom: 1.5px solid var(--muted);
+  transform: rotate(45deg);
+  margin-left: 13px;
+  flex-shrink: 0;
+}
+.duplicate-group[open] .chevron {
+  transform: rotate(225deg);
+  margin-top: 4px;
+}
+.group-content {
+  padding: 0 20px 0;
+}
+.list-caption {
+  border-top: 1px solid #eceee8;
+  padding-top: 13px;
+  font-size: 9px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.file-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.file-list li {
+  display: flex;
+  gap: 12px;
+  align-items: start;
+  padding: 10px 0;
+  border-top: 1px solid #f0f1eb;
+  font-size: 10px;
+}
+.file-list li:first-child {
+  border: 0;
+}
+.file-index {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: #777f71;
+  background: #f1f3ed;
+  padding: 1px 5px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+.file-path {
+  font-family: var(--mono);
+  overflow-wrap: anywhere;
+  flex: 1;
+  min-width: 0;
+}
+.file-size {
+  font-family: var(--mono);
+  font-size: 9px;
+  white-space: nowrap;
+  color: var(--muted);
+  padding-top: 1px;
+}
+.hash {
+  display: flex;
+  gap: 10px;
+  border-top: 1px solid #eceee8;
+  margin-top: 4px;
+  padding: 11px 0;
+  font-size: 8px;
+  color: #737a6f;
+  align-items: start;
+}
+.hash > span {
+  font-weight: 600;
+  flex-shrink: 0;
+  padding-top: 1px;
+}
+.hash code {
+  font-size: 9px;
+  font-family: var(--mono);
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.empty-state {
+  padding: 36px 24px;
+  border: 1px dashed #cdd2c6;
+  background: #efefe8;
+  border-radius: 7px;
+  text-align: center;
+  margin-top: 18px;
+}
+.empty-state > span {
+  font-size: 28px;
+  line-height: 1;
+  color: #7a896e;
+}
+.empty-state h3 {
+  font-size: 16px;
+  font-weight: 500;
+  margin-top: 12px;
+}
+.empty-state p {
+  font-size: 12px;
+  color: var(--muted);
+  max-width: 520px;
+  margin: 8px auto 0;
+}
+.noscript-note {
+  padding: 12px 15px;
+  background: #eceee5;
+  margin-top: 18px;
+  font-size: 11px;
+  border-radius: 5px;
+}
+.scope-section {
+  border-top: 1px solid var(--line);
+  padding-top: 32px;
+}
+.method-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 28px;
+  margin: 25px 0;
+}
+.method-number {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--accent);
+}
+.method-grid h3 {
+  font-size: 12px;
+  font-weight: 600;
+  margin: 8px 0 7px;
+}
+.method-grid p {
+  font-size: 11px;
+  line-height: 1.9;
+  color: var(--muted);
+}
+.scope-record {
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #f0f0ea;
+  padding: 18px 21px;
+}
+.scope-record-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  align-items: center;
+}
+.scope-record-heading h3 {
+  font-size: 12px;
+  font-weight: 600;
+}
+.scope-record-heading p {
+  font-size: 10px;
+  color: var(--muted);
+}
+.scope-clean {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 9px;
+}
+.scope-details {
+  border-top: 1px solid #d8dcd1;
+  margin-top: 13px;
+  padding-top: 11px;
+  font-size: 11px;
+}
+.scope-details summary {
+  cursor: pointer;
+  padding: 3px 0;
+  color: #4e574a;
+}
+.scope-details summary > span {
+  font-family: var(--mono);
+  font-size: 9px;
+  background: #e0e4d9;
+  padding: 2px 5px;
+  margin-left: 5px;
+  border-radius: 3px;
+}
+.entry-list,
+.excludes {
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.entry-list li {
+  display: flex;
+  gap: 14px;
+  border-top: 1px solid #dce0d6;
+  padding: 10px 0;
+  font-size: 10px;
+}
+.entry-list li code {
+  width: 46%;
+  overflow-wrap: anywhere;
+  font-family: var(--mono);
+}
+.entry-list li > span {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: var(--muted);
+}
+.excludes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.excludes li {
+  background: #e3e6dd;
+  border-radius: 3px;
+  padding: 3px 6px;
+  font-size: 10px;
+  overflow-wrap: anywhere;
+  max-width: 100%;
+}
+.report-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-top: 38px;
+  padding: 23px 0 30px;
+  border-top: 1px solid var(--line);
+  font-size: 9px;
+  color: var(--muted);
+}
+.report-footer strong {
+  font-size: 15px;
+  font-weight: 650;
+  letter-spacing: -0.7px;
+  color: var(--ink);
+  margin-right: 8px;
+}
+@media (min-width: 1550px) {
+  main {
+    padding-left: 75px;
+    padding-right: 75px;
+  }
+  .hero {
+    padding-top: 58px;
+    padding-bottom: 45px;
+  }
+  .metric {
+    padding: 25px;
+  }
+  .metric-value {
+    font-size: 38px;
+  }
+}
+@media (max-width: 1150px) {
+  .sidebar {
+    width: 206px;
+    padding-left: 19px;
+    padding-right: 19px;
+  }
+  main {
+    margin-left: 206px;
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+  .metrics {
+    gap: 9px;
+  }
+  .metric {
+    padding: 17px 12px;
+  }
+  .metric-note {
+    font-size: 8px;
+  }
+  .hero {
+    gap: 22px;
+  }
+  .analysis-meta {
+    min-width: 150px;
+  }
+  .method-grid {
+    gap: 18px;
+  }
+  .volume-legend {
+    gap: 10px 18px;
+  }
+}
+@media (max-width: 900px) {
+  .sidebar {
+    position: static;
+    width: 100%;
+    padding: 21px 28px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 17px;
+  }
+  .brand > span {
+    font-size: 28px;
+  }
+  .brand svg {
+    width: 30px;
+    height: 30px;
+  }
+  .brand-caption,
+  .nav-caption,
+  .sidebar-folder,
+  .sidebar-footer {
+    display: none;
+  }
+  .sidebar nav {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+  }
+  .sidebar nav a {
+    font-size: 11px;
+    padding: 9px 10px;
+    gap: 8px;
+  }
+  .sidebar nav svg,
+  .sidebar nav .nav-count {
+    display: none;
+  }
+  main {
+    margin-left: 0;
+    padding: 0 28px;
+  }
+  .topbar {
+    min-height: 65px;
+  }
+  .hero {
+    padding-top: 36px;
+  }
+  h1 {
+    font-size: 54px;
+  }
+  .metric-value {
+    font-size: 29px;
+  }
+  .metric-note {
+    font-size: 9px;
+  }
+}
+@media (max-width: 620px) {
+  html {
+    scroll-padding-top: 15px;
+  }
+  .sidebar {
+    padding: 20px;
+    display: flex;
+    gap: 17px;
+  }
+  .brand {
+    align-self: start;
+  }
+  .sidebar nav {
+    justify-content: space-between;
+    gap: 3px;
+    width: 100%;
+  }
+  .sidebar nav a {
+    flex: 1;
+    justify-content: center;
+    padding: 9px 5px;
+    font-size: 10px;
+    gap: 6px;
+    white-space: nowrap;
+  }
+  .sidebar nav a > span:first-child {
+    font-size: 8px;
+  }
+  main {
+    padding: 0 20px;
+  }
+  .topbar {
+    min-height: 58px;
+  }
+  .topbar > span {
+    font-size: 8px;
+    letter-spacing: 0.9px;
+    max-width: 160px;
+    line-height: 1.8;
+  }
+  .print-button {
+    font-size: 0;
+    padding: 8px;
+  }
+  .print-button svg {
+    height: 15px;
+    width: 15px;
+  }
+  .hero {
+    display: block;
+    padding: 29px 0 26px;
+  }
+  .hero .eyebrow {
+    font-size: 8px;
+    margin-bottom: 15px;
+  }
+  h1 {
+    font-size: 49px;
+    letter-spacing: -1.8px;
+  }
+  .hero-description {
+    font-size: 11px;
+    margin-top: 17px;
+  }
+  .analysis-meta {
+    max-width: none;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    column-gap: 10px;
+    align-items: start;
+    margin-top: 26px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+  }
+  .analysis-meta .status {
+    grid-column: 2;
+    grid-row: 1 / span 3;
+    margin: 2px 0 0;
+    font-size: 9px;
+    padding: 6px 8px;
+  }
+  .meta-label {
+    font-size: 8px;
+    margin: 0;
+  }
+  .analysis-meta strong {
+    grid-column: 1;
+    font-size: 12px;
+  }
+  .analysis-meta time {
+    grid-column: 1;
+    font-size: 9px;
+    margin-top: 4px;
+  }
+  .metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .metric {
+    padding: 16px 14px;
+  }
+  .metric h3 {
+    font-size: 10px;
+  }
+  .metric-value {
+    font-size: 28px;
+    margin-top: 8px;
+  }
+  .metric-note {
+    font-size: 8px;
+    line-height: 1.6;
+    margin-top: 4px;
+  }
+  .volume-panel {
+    padding: 19px 17px 15px;
+    margin-top: 13px;
+  }
+  .volume-heading h2 {
+    font-size: 12px;
+  }
+  .volume-heading p {
+    font-size: 9px;
+    max-width: 160px;
+  }
+  .volume-heading > strong {
+    font-size: 26px;
+  }
+  .volume-legend {
+    flex-direction: column;
+    gap: 6px;
+    font-size: 9px;
+  }
+  .volume-legend > span strong {
+    margin-left: auto;
+  }
+  .estimate-note {
+    font-size: 9px;
+    line-height: 1.8;
+  }
+  .duplicates-section,
+  .scope-section {
+    margin-top: 34px;
+  }
+  .section-heading {
+    align-items: start;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .section-heading h2 {
+    font-size: 29px;
+  }
+  .section-heading .eyebrow {
+    font-size: 8px;
+    letter-spacing: 1.5px;
+    margin-bottom: 8px;
+  }
+  .section-badge {
+    font-size: 7px;
+    line-height: 1.5;
+    margin-top: 2px;
+  }
+  .section-description {
+    font-size: 10px;
+  }
+  .group-tools {
+    display: block;
+    margin-top: 19px;
+  }
+  .search-input input {
+    font-size: 11px;
+    height: 42px;
+  }
+  .select-field {
+    margin-top: 11px;
+  }
+  .select-field select {
+    width: 100%;
+    height: 42px;
+  }
+  .search-field label,
+  .select-field label {
+    font-size: 10px;
+    margin-bottom: 5px;
+  }
+  .results-toolbar {
+    display: block;
+    font-size: 10px;
+  }
+  .expand-buttons {
+    margin-top: 4px;
+    gap: 9px;
+  }
+  .expand-buttons button {
+    font-size: 10px;
+  }
+  .duplicate-group summary {
+    padding: 15px 13px;
+    gap: 10px;
+  }
+  .group-symbol {
+    width: 29px;
+    height: 32px;
+    font-size: 23px;
+  }
+  .group-name {
+    font-size: 11px;
+  }
+  .group-description {
+    font-size: 9px;
+  }
+  .group-potential strong {
+    font-size: 11px;
+  }
+  .group-potential > span {
+    font-size: 8px;
+  }
+  .chevron {
+    margin-left: 2px;
+    width: 6px;
+    height: 6px;
+  }
+  .group-content {
+    padding: 0 13px;
+  }
+  .list-caption {
+    font-size: 8px;
+  }
+  .file-list li {
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 10px 0;
+  }
+  .file-index {
+    font-size: 8px;
+    padding: 2px 4px;
+  }
+  .file-path {
+    font-size: 10px;
+    line-height: 1.7;
+  }
+  .file-size {
+    width: 100%;
+    padding: 0 0 0 29px;
+    margin-top: -6px;
+    font-size: 8px;
+  }
+  .hash {
+    gap: 7px;
+    font-size: 7px;
+  }
+  .hash code {
+    font-size: 8px;
+  }
+  .method-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    margin: 22px 0;
+  }
+  .method-grid article {
+    padding-left: 29px;
+    position: relative;
+  }
+  .method-number {
+    position: absolute;
+    left: 0;
+    top: 2px;
+  }
+  .method-grid h3 {
+    margin: 0 0 5px;
+    font-size: 12px;
+  }
+  .method-grid p {
+    font-size: 11px;
+  }
+  .scope-record {
+    padding: 16px;
+  }
+  .scope-record-heading {
+    display: block;
+  }
+  .scope-record-heading p {
+    font-size: 9px;
+    margin-top: 4px;
+  }
+  .scope-clean {
+    font-size: 10px;
+  }
+  .entry-list li {
+    display: block;
+  }
+  .entry-list li code {
+    display: block;
+    width: auto;
+  }
+  .entry-list li > span {
+    display: block;
+    margin-top: 5px;
+  }
+  .report-footer {
+    display: block;
+    margin-top: 28px;
+    padding-bottom: 22px;
+    font-size: 8px;
+  }
+  .report-footer > span {
+    display: block;
+    margin-top: 6px;
+  }
+  .warning {
+    padding: 14px;
+    font-size: 11px;
+  }
+  .empty-state {
+    padding: 28px 15px;
+  }
+  .empty-state h3 {
+    font-size: 15px;
+  }
+  .empty-state p {
+    font-size: 11px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  button {
+    transition: none;
+  }
+}
+@media print {
+  @page {
+    margin: 16mm;
+  }
+  body {
+    font-size: 10pt;
+    background: white;
+  }
+  .sidebar,
+  .topbar,
+  .group-tools,
+  .results-toolbar,
+  .skip-link,
+  #no-results,
+  noscript {
+    display: none !important;
+  }
+  main {
+    margin: 0;
+    padding: 0;
+    max-width: none;
+  }
+  .hero {
+    padding: 0 0 22px;
+  }
+  h1 {
+    font-size: 37pt;
+  }
+  .hero-description {
+    font-size: 9pt;
+  }
+  .metrics {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .metric {
+    padding: 12px;
+  }
+  .metric-value {
+    font-size: 21pt;
+  }
+  .metric h3 {
+    font-size: 8pt;
+  }
+  .metric-note {
+    font-size: 7pt;
+  }
+  .volume-panel {
+    padding: 16px;
+  }
+  .volume-bar,
+  .volume-bar > span,
+  .legend-base,
+  .legend-extra,
+  .metric-accent {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+  .section-heading h2 {
+    font-size: 23pt;
+  }
+  .duplicates-section,
+  .scope-section {
+    margin-top: 26px;
+  }
+  .duplicate-group,
+  .method-grid article,
+  .scope-record {
+    break-inside: avoid;
+  }
+  .duplicate-group[hidden] {
+    display: block !important;
+  }
+  .duplicate-group::details-content,
+  .scope-details::details-content {
+    content-visibility: visible !important;
+    display: block !important;
+  }
+  .group-content {
+    display: block !important;
+  }
+  .chevron {
+    display: none;
+  }
+  .group-description,
+  .group-potential > span,
+  .section-description,
+  .method-grid p,
+  .file-path {
+    font-size: 8pt;
+  }
+  .file-size,
+  .hash code {
+    font-size: 7pt;
+  }
+  .method-grid {
+    gap: 18px;
+  }
+  .report-footer {
+    font-size: 7pt;
+  }
+  a {
+    text-decoration: none;
+  }
+  .status {
+    border-color: #a5b39c;
+  }
+  .analysis-meta time {
+    font-size: 8pt;
+  }
+}
+</style></head>
+<body>
+<a class="skip-link" href="#main">Pular para o relatório</a>
+<aside class="sidebar">
+  <a class="brand" href="#overview" aria-label="Rastro, início do relatório"><svg viewBox="0 0 36 36" aria-hidden="true"><path d="M8 26V10h9v16h11V10"/><path d="M8 18h20"/></svg><span>rastro<span class="brand-dot">.</span></span></a>
+  <p class="brand-caption">Um olhar sobre seus arquivos.</p>
+  <p class="nav-caption">SEU RELATÓRIO</p>
+  <nav aria-label="Seções do relatório">
+    <a href="#overview"><span>01</span>Visão geral<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+    <a href="#duplicates"><span>02</span>Duplicados<span class="nav-count">4</span></a>
+    <a href="#scope"><span>03</span>Sobre a análise</a>
+  </nav>
+  <div class="sidebar-folder"><span>PASTA ANALISADA</span><strong>demo</strong><p>Caminhos exibidos a partir desta pasta.</p></div>
+  <div class="sidebar-footer"><span class="offline-dot"></span><strong>Local, do início ao fim.</strong><p>Seus arquivos continuam com você.</p></div>
+</aside>
+<main id="main">
+  <div class="topbar"><span>ORGANIZAÇÃO COMEÇA COM CLAREZA</span><button class="print-button" id="print-report" type="button" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8V3h10v5M7 17H3V9h18v8h-4M7 14h10v7H7z"/></svg>Imprimir relatório</button></div>
+  <section id="overview" aria-labelledby="overview-title">
+    <header class="hero"><div><p class="eyebrow">ANÁLISE #1</p><h1 id="overview-title">Sua pasta,<br><em>em perspectiva.</em></h1><p class="hero-description">Encontre o que se repete. Revise com calma.<br>Um mapa dos seus arquivos, sem mover ou apagar nada.</p></div>
+      <div class="analysis-meta"><span class="status"><span aria-hidden="true"></span>Análise concluída</span><span class="meta-label">PASTA</span><strong>demo</strong><time datetime="2026-09-24T21:20:40+00:00">24 set 2026 · 21:20 UTC</time></div>
+    </header>
+    
+    <div class="metrics"><article class="metric"><h3>Arquivos analisados</h3><p class="metric-value">14</p><p class="metric-note">com leitura e hash concluídos</p></article><article class="metric"><h3>Volume analisado</h3><p class="metric-value">2,8 MiB</p><p class="metric-note">soma dos tamanhos dos arquivos</p></article><article class="metric"><h3>Grupos duplicados</h3><p class="metric-value">4</p><p class="metric-note">6 arquivos excedentes</p></article><article class="metric metric-accent"><h3>Excedente lógico</h3><p class="metric-value">1,8 MiB</p><p class="metric-note">estimativa para sua revisão</p></article></div>
+    <div class="volume-panel"><div class="volume-heading"><div><h2>O espaço em perspectiva</h2><p>Distribuição do volume lógico analisado</p></div><strong>64,8<span>%</span><small>excedente</small></strong></div>
+      <div class="volume-bar" role="img" aria-label="64,8% do volume analisado corresponde ao excedente lógico estimado"><span style="width:64.7779%"></span></div>
+      <div class="volume-legend"><span><i class="legend-base" aria-hidden="true"></i>Base de comparação <strong>1,0 MiB</strong></span><span><i class="legend-extra" aria-hidden="true"></i>Excedente lógico <strong>1,8 MiB</strong></span></div>
+      <p class="estimate-note">A estimativa desconta uma cópia por grupo. Não indica um arquivo original nem garante espaço livre em disco.</p>
+    </div>
+  </section>
+  <section id="duplicates" class="duplicates-section" aria-labelledby="duplicates-title">
+    <div class="section-heading"><div><p class="eyebrow">02 / REVISÃO DE ARQUIVOS</p><h2 id="duplicates-title">O que se repete<span class="heading-dot">.</span></h2></div><span class="section-badge">TAMANHO + SHA-256</span></div>
+    <p class="section-description">Cada grupo reúne arquivos com o mesmo tamanho e hash SHA-256. Nenhum deles é escolhido como original.</p>
+    
+        <div class="group-tools" id="group-tools" hidden>
+          <div class="search-field"><label for="file-search">Buscar por caminho</label>
+            <div class="search-input"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg>
+              <input id="file-search" type="search" placeholder="Ex.: faculdade / proposta.pdf" autocomplete="off">
+              <button type="button" id="clear-search" aria-label="Limpar busca" hidden>×</button></div></div>
+          <div class="select-field"><label for="group-filter">Quantidade de arquivos</label>
+            <select id="group-filter"><option value="all">Todos os grupos</option><option value="3">3 ou mais arquivos</option></select></div>
+        </div>
+        <div class="results-toolbar" id="results-toolbar" hidden>
+          <p id="result-count" role="status" aria-live="polite"></p>
+          <div class="expand-buttons"><button type="button" id="expand-all">Expandir grupos</button><span aria-hidden="true">/</span><button type="button" id="collapse-all">Recolher grupos</button></div>
+        </div>
+        <div class="empty-state" id="no-results" hidden><span aria-hidden="true">⌕</span><h3>Nenhum grupo corresponde à busca.</h3><p>Experimente outro trecho do caminho ou selecione todos os grupos.</p></div>
+        <noscript><p class="noscript-note">Todos os grupos estão disponíveis abaixo. A busca precisa de JavaScript.</p></noscript>
+    
+    <div id="groups"><details class="duplicate-group" data-files="3" open>
+      <summary>
+        <span class="group-symbol" aria-hidden="true">≋</span>
+        <span class="group-heading"><span class="group-name">Grupo 01</span>
+          <span class="group-description">3 arquivos · 498,0 KiB cada</span></span>
+        <span class="group-potential"><strong>996,1 KiB</strong><span>excedente lógico</span></span>
+        <span class="chevron" aria-hidden="true"></span>
+      </summary>
+      <div class="group-content">
+        <p class="list-caption">Caminhos relativos à pasta analisada</p>
+        <ol class="file-list"><li><span class="file-index" aria-hidden="true">01</span><span class="file-path">backup/catalogo-papelaria.txt</span><span class="file-size">498,0 KiB</span></li><li><span class="file-index" aria-hidden="true">02</span><span class="file-path">entregas/catalogo-revisado.txt</span><span class="file-size">498,0 KiB</span></li><li><span class="file-index" aria-hidden="true">03</span><span class="file-path">referencias/catalogo-papelaria.txt</span><span class="file-size">498,0 KiB</span></li></ol>
+        <p class="hash"><span>SHA-256</span><code>d74c1bcfe9fb7367ee5fd3a698314353cedeb87648e340888b3473255edce19d</code></p>
+      </div>
+    </details><details class="duplicate-group" data-files="3" open>
+      <summary>
+        <span class="group-symbol" aria-hidden="true">≋</span>
+        <span class="group-heading"><span class="group-name">Grupo 02</span>
+          <span class="group-description">3 arquivos · 362,5 KiB cada</span></span>
+        <span class="group-potential"><strong>725,0 KiB</strong><span>excedente lógico</span></span>
+        <span class="chevron" aria-hidden="true"></span>
+      </summary>
+      <div class="group-content">
+        <p class="list-caption">Caminhos relativos à pasta analisada</p>
+        <ol class="file-list"><li><span class="file-index" aria-hidden="true">01</span><span class="file-path">backup/guia-identidade-copia.md</span><span class="file-size">362,5 KiB</span></li><li><span class="file-index" aria-hidden="true">02</span><span class="file-path">entregas/guia-identidade-final.md</span><span class="file-size">362,5 KiB</span></li><li><span class="file-index" aria-hidden="true">03</span><span class="file-path">projetos/horizonte/guia-identidade.md</span><span class="file-size">362,5 KiB</span></li></ol>
+        <p class="hash"><span>SHA-256</span><code>27d6d3d756eb8fc5217731949cb130ed0edbd2a2d951e0543e9d1a8ea24cd76d</code></p>
+      </div>
+    </details><details class="duplicate-group" data-files="2" open>
+      <summary>
+        <span class="group-symbol" aria-hidden="true">≋</span>
+        <span class="group-heading"><span class="group-name">Grupo 03</span>
+          <span class="group-description">2 arquivos · 164,4 KiB cada</span></span>
+        <span class="group-potential"><strong>164,4 KiB</strong><span>excedente lógico</span></span>
+        <span class="chevron" aria-hidden="true"></span>
+      </summary>
+      <div class="group-content">
+        <p class="list-caption">Caminhos relativos à pasta analisada</p>
+        <ol class="file-list"><li><span class="file-index" aria-hidden="true">01</span><span class="file-path">backup/briefing-feirabairro.txt</span><span class="file-size">164,4 KiB</span></li><li><span class="file-index" aria-hidden="true">02</span><span class="file-path">projetos/feira/briefing.txt</span><span class="file-size">164,4 KiB</span></li></ol>
+        <p class="hash"><span>SHA-256</span><code>e8da5f4dcfd010898a637661243f4e0948d2e99a49c8110b5e1b6ceb851e5a7c</code></p>
+      </div>
+    </details><details class="duplicate-group" data-files="2" open>
+      <summary>
+        <span class="group-symbol" aria-hidden="true">≋</span>
+        <span class="group-heading"><span class="group-name">Grupo 04</span>
+          <span class="group-description">2 arquivos · 263 B cada</span></span>
+        <span class="group-potential"><strong>263 B</strong><span>excedente lógico</span></span>
+        <span class="chevron" aria-hidden="true"></span>
+      </summary>
+      <div class="group-content">
+        <p class="list-caption">Caminhos relativos à pasta analisada</p>
+        <ol class="file-list"><li><span class="file-index" aria-hidden="true">01</span><span class="file-path">entregas/cartaz-aprovado.svg</span><span class="file-size">263 B</span></li><li><span class="file-index" aria-hidden="true">02</span><span class="file-path">projetos/feira/cartaz.svg</span><span class="file-size">263 B</span></li></ol>
+        <p class="hash"><span>SHA-256</span><code>4d3144b049191704409c10ad2a7bd92e05730620fd4c5177eadddb3b02004c23</code></p>
+      </div>
+    </details></div>
+  </section>
+  <section id="scope" class="scope-section" aria-labelledby="scope-title">
+    <div class="section-heading"><div><p class="eyebrow">03 / CONTEXTO E CRITÉRIOS</p><h2 id="scope-title">Sobre a análise<span class="heading-dot">.</span></h2></div></div>
+    <div class="method-grid"><article><span class="method-number">01</span><h3>Conteúdo, além do nome</h3><p>Os grupos comparam tamanho e SHA-256. Arquivos vazios entram na contagem, mas não nos grupos.</p></article><article><span class="method-number">02</span><h3>Uma fotografia da pasta</h3><p>O relatório retrata a análise de 24 set 2026 · 21:20 UTC. Mudanças posteriores nos arquivos não aparecem aqui.</p></article><article><span class="method-number">03</span><h3>Decisões nas suas mãos</h3><p>O Rastro apenas analisa. Revise a finalidade de cada cópia antes de organizar seus arquivos.</p></article></div>
+    <div class="scope-record"><div class="scope-record-heading"><h3>Registro da análise</h3><p>0 ocorrência(s) · 1 item(ns) ignorado(s)</p></div><details class="scope-details"><summary>Itens ignorados <span>1</span></summary><ul class="entry-list"><li><code>.git</code><span>Padrão de exclusão</span></li></ul></details><details class="scope-details"><summary>Padrões de exclusão <span>4</span></summary><ul class="excludes"><li><code>.git</code></li><li><code>node_modules</code></li><li><code>.venv</code></li><li><code>__pycache__</code></li></ul></details></div>
+  </section>
+  <footer class="report-footer"><span><strong>rastro.</strong> Clareza para organizar.</span><span>Relatório offline · Tamanhos em unidades binárias (1 KiB = 1.024 B)</span></footer>
+</main><script>(() => {
+  "use strict";
+  const printButton = document.getElementById("print-report");
+  printButton.hidden = false;
+  printButton.addEventListener("click", () => window.print());
+  const groups = [...document.querySelectorAll(".duplicate-group")];
+  const allDetails = [...document.querySelectorAll("details")];
+  let printState = [];
+  window.addEventListener("beforeprint", () => {
+    printState = allDetails.map((detail) => ({
+      detail,
+      open: detail.open,
+      hidden: detail.hidden,
+    }));
+    allDetails.forEach((detail) => {
+      detail.open = true;
+      detail.hidden = false;
+    });
+  });
+  window.addEventListener("afterprint", () => {
+    printState.forEach(({ detail, open, hidden }) => {
+      detail.open = open;
+      detail.hidden = hidden;
+    });
+    printState = [];
+  });
+  if (!groups.length) return;
+  const search = document.getElementById("file-search");
+  const filter = document.getElementById("group-filter");
+  const clear = document.getElementById("clear-search");
+  const count = document.getElementById("result-count");
+  const expand = document.getElementById("expand-all");
+  const collapse = document.getElementById("collapse-all");
+  const normalize = (value) =>
+    value
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLocaleLowerCase("pt-BR");
+  const paths = new Map(
+    groups.map((group) => [
+      group,
+      normalize(group.querySelector(".file-list").textContent),
+    ]),
+  );
+  function updateButtons() {
+    const visible = groups.filter((group) => !group.hidden);
+    expand.disabled =
+      visible.length === 0 || visible.every((group) => group.open);
+    collapse.disabled =
+      visible.length === 0 || visible.every((group) => !group.open);
+  }
+  function update() {
+    const query = normalize(search.value.trim());
+    let visible = 0;
+    groups.forEach((group) => {
+      const matches =
+        paths.get(group).includes(query) &&
+        (filter.value === "all" || Number(group.dataset.files) >= 3);
+      group.hidden = !matches;
+      if (matches) visible += 1;
+    });
+    clear.hidden = !search.value;
+    count.textContent = `${visible} de ${groups.length} ${groups.length === 1 ? "grupo exibido" : "grupos exibidos"}`;
+    document.getElementById("no-results").hidden = visible !== 0;
+    updateButtons();
+  }
+  search.addEventListener("input", update);
+  filter.addEventListener("change", update);
+  clear.addEventListener("click", () => {
+    search.value = "";
+    update();
+    search.focus();
+  });
+  expand.addEventListener("click", () => {
+    groups
+      .filter((group) => !group.hidden)
+      .forEach((group) => {
+        group.open = true;
+      });
+    updateButtons();
+  });
+  collapse.addEventListener("click", () => {
+    groups
+      .filter((group) => !group.hidden)
+      .forEach((group) => {
+        group.open = false;
+      });
+    updateButtons();
+  });
+  groups.forEach((group) => group.addEventListener("toggle", updateButtons));
+  document.getElementById("group-tools").hidden = false;
+  document.getElementById("results-toolbar").hidden = false;
+  update();
+})();
+</script></body></html>

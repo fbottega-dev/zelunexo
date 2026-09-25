@@ -1,0 +1,39 @@
+name: Python CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: ${{ matrix.os }} / Python ${{ matrix.python }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ['3.12', '3.13', '3.14']
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Run behavior tests
+        run: python -m unittest discover -s tests -v
+      - name: Check Python compilation
+        run: python -m compileall -q rastro tests
+      - name: Create sample files
+        run: python -m rastro demo ./ci-demo
+      - name: Analyze sample files
+        run: python -m rastro analisar ./ci-demo --banco ./.rastro/historico.sqlite3 --html ./ci-relatorio.html
+      - name: Read saved history
+        run: python -m rastro historico --banco ./.rastro/historico.sqlite3
+      - name: Export saved analysis as HTML
+        run: python -m rastro exportar 1 --banco ./.rastro/historico.sqlite3 --saida ./ci-copia.html
+      - name: Export saved analysis as JSON
+        run: python -m rastro exportar 1 --banco ./.rastro/historico.sqlite3 --saida ./ci-copia.json --formato json
