@@ -12,7 +12,7 @@ from .domain import group_duplicates, summarize
 from .scanner import scan_folder
 from .storage import list_scans, load_scan, save_scan
 
-DEFAULT_DATABASE = Path(".rastro/historico.sqlite3")
+DEFAULT_DATABASE = Path(".zelunexo/historico.sqlite3")
 
 
 def terminal_text(value: object) -> str:
@@ -31,10 +31,10 @@ def format_bytes(value: int) -> str:
 
 def parser() -> argparse.ArgumentParser:
     root = argparse.ArgumentParser(
-        prog="rastro", description="Encontre arquivos duplicados pelo conteúdo, sem alterar os originais.",
-        epilog="Exemplo: python -m rastro analisar ./demo --html ./relatorio.html",
+        prog="zelunexo", description="Encontre arquivos duplicados pelo conteúdo, sem alterar os originais.",
+        epilog="Exemplo: python -m zelunexo analisar ./demo --html ./relatorio.html",
     )
-    root.add_argument("--version", action="version", version=f"Rastro {__version__}")
+    root.add_argument("--version", action="version", version=f"Zelunexo {__version__}")
     commands = root.add_subparsers(dest="command", required=True, title="comandos")
     demo = commands.add_parser("demo", help="criar arquivos fictícios em uma pasta nova")
     demo.add_argument("pasta", type=Path, help="pasta que ainda não existe")
@@ -81,8 +81,8 @@ def write_export(scan: dict, path: Path, output_format: str) -> None:
 def execute(args: argparse.Namespace) -> int:
     if args.command == "demo":
         count = create_demo(args.pasta)
-        print(f"Rastro · {count} arquivos fictícios criados em {terminal_text(args.pasta)}.")
-        print("Próximo passo: python -m rastro analisar \"" + terminal_text(args.pasta) + '\" --html ./relatorio.html')
+        print(f"Zelunexo · {count} arquivos fictícios criados em {terminal_text(args.pasta)}.")
+        print("Próximo passo: python -m zelunexo analisar \"" + terminal_text(args.pasta) + '\" --html ./relatorio.html')
         return 0
     if args.command == "analisar":
         require_outside(args.pasta, args.banco, "O banco")
@@ -95,7 +95,7 @@ def execute(args: argparse.Namespace) -> int:
         scan = scan_folder(args.pasta, args.ignorar)
         scan["id"] = save_scan(args.banco, scan)
         summary = summarize(scan)
-        print(f"\nRastro · Análise #{scan['id']} · {'PARCIAL' if scan['issues'] else 'concluída'}")
+        print(f"\nZelunexo · Análise #{scan['id']} · {'PARCIAL' if scan['issues'] else 'concluída'}")
         print(f"{summary['scanned_files']} arquivos lidos · {format_bytes(summary['total_bytes'])}")
         print(f"{summary['duplicate_groups']} grupos · {summary['redundant_files']} cópias excedentes · {format_bytes(summary['potential_bytes'])} redundantes")
         print("Estimativa de bytes lógicos. Nenhum arquivo original foi alterado.")
@@ -114,9 +114,9 @@ def execute(args: argparse.Namespace) -> int:
         return 0
     if args.command == "historico":
         scans = list_scans(args.banco)
-        print("Rastro · Histórico (últimas 20 análises)\n")
+        print("Zelunexo · Histórico (últimas 20 análises)\n")
         if not scans:
-            print("Nenhuma análise salva. Comece com: python -m rastro analisar ./demo")
+            print("Nenhuma análise salva. Comece com: python -m zelunexo analisar ./demo")
         for scan in scans:
             state = "parcial" if scan["issues_count"] else "completa"
             print(f"#{scan['id']} · {terminal_text(scan['created_at'])} · {terminal_text(scan['folder'])} · {state}")

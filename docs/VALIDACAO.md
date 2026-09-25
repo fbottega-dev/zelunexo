@@ -14,4 +14,4 @@ A revisão com apoio de IA encontrou e corrigiu duas falhas antes da publicaçã
 
 ## Verificação remota
 
-O workflow executa testes e comandos completos em Ubuntu e Windows, nas versões Python 3.12, 3.13 e 3.14. Os resultados por commit ficam disponíveis em [GitHub Actions](https://github.com/fbottega-dev/rastro-arquivos/actions/workflows/ci.yml). Consulte a execução correspondente; o resultado local acima não substitui o resultado remoto.
+O workflow executa testes e comandos completos em Ubuntu e Windows, nas versões Python 3.12, 3.13 e 3.14. Os resultados por commit ficam disponíveis em [GitHub Actions](https://github.com/fbottega-dev/zelunexo/actions/workflows/ci.yml). Consulte a execução correspondente; o resultado local acima não substitui o resultado remoto.

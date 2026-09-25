@@ -6,8 +6,8 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from rastro.cli import main, terminal_text
-from rastro.storage import list_scans
+from zelunexo.cli import main, terminal_text
+from zelunexo.storage import list_scans
 
 
 class CliTests(unittest.TestCase):
@@ -64,7 +64,7 @@ class CliTests(unittest.TestCase):
 
     def test_partial_scan_is_persisted_but_exit_is_three(self):
         self.demo.mkdir()
-        with patch("rastro.scanner.digest_file", side_effect=PermissionError("Sem acesso")):
+        with patch("zelunexo.scanner.digest_file", side_effect=PermissionError("Sem acesso")):
             (self.demo / "a.txt").write_text("arquivo")
             code, output, errors = self.call("analisar", self.demo, "--banco", self.db)
         self.assertEqual(code, 3)

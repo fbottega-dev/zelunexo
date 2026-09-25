@@ -27,7 +27,7 @@ def create_demo(destination: Path) -> int:
         "entregas/cartaz-aprovado.svg": poster,
         "projetos/feira/notas.md": b"# Pendencias ficticias\nRevisar o horario das oficinas.\n",
         "projetos/horizonte/notas.md": b"# Pendencias ficticias\nConferir as margens do material.\n",
-        "referencias/leia-me.txt": "Acervo gerado pelo Rastro. Todos os dados são fictícios.\n".encode(),
+        "referencias/leia-me.txt": "Acervo gerado pelo Zelunexo. Todos os dados são fictícios.\n".encode(),
         "referencias/rascunho-vazio.txt": b"",
         ".git/ignorado.txt": b"Este arquivo demonstra uma exclusao padrao.\n",
     }

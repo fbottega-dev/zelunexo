@@ -9,8 +9,8 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
-from rastro.domain import group_duplicates, summarize
-from rastro.scanner import BLOCK_SIZE, digest_file, scan_folder
+from zelunexo.domain import group_duplicates, summarize
+from zelunexo.scanner import BLOCK_SIZE, digest_file, scan_folder
 
 
 def changed_stat(info):
@@ -181,7 +181,7 @@ class ScannerTests(unittest.TestCase):
                 raise PermissionError(errno.EACCES, "Acesso negado")
             return original_open(path, flags, *args, **kwargs)
 
-        with patch("rastro.scanner.os.open", side_effect=controlled_open):
+        with patch("zelunexo.scanner.os.open", side_effect=controlled_open):
             scan = scan_folder(self.root)
 
         self.assertEqual([file["path"] for file in scan["files"]], ["permitido.txt"])
@@ -197,7 +197,7 @@ class ScannerTests(unittest.TestCase):
                 raise PermissionError(errno.EACCES, "Pasta sem acesso")
             return original_scandir(path)
 
-        with patch("rastro.scanner.os.scandir", side_effect=controlled_scandir):
+        with patch("zelunexo.scanner.os.scandir", side_effect=controlled_scandir):
             scan = scan_folder(self.root)
 
         self.assertEqual([file["path"] for file in scan["files"]], ["permitido.txt"])
@@ -207,7 +207,7 @@ class ScannerTests(unittest.TestCase):
         path = self.write_file("mudou.txt")
         expected = path.lstat()
 
-        with patch("rastro.scanner.os.fstat", return_value=changed_stat(expected)):
+        with patch("zelunexo.scanner.os.fstat", return_value=changed_stat(expected)):
             with self.assertRaisesRegex(OSError, "mudou antes"):
                 digest_file(path, expected)
 
@@ -218,7 +218,7 @@ class ScannerTests(unittest.TestCase):
         descriptor_info.st_mtime_ns = expected.st_mtime_ns
         descriptor_info.st_ctime_ns += 100
 
-        with patch("rastro.scanner.os.fstat", side_effect=[descriptor_info, descriptor_info]):
+        with patch("zelunexo.scanner.os.fstat", side_effect=[descriptor_info, descriptor_info]):
             digest = digest_file(path, expected)
 
         self.assertEqual(digest, hashlib.sha256(b"estavel").hexdigest())
@@ -230,7 +230,7 @@ class ScannerTests(unittest.TestCase):
         changed.st_mtime_ns = expected.st_mtime_ns
         changed.st_ctime_ns += 1
 
-        with patch("rastro.scanner.os.fstat", side_effect=[expected, changed]):
+        with patch("zelunexo.scanner.os.fstat", side_effect=[expected, changed]):
             with self.assertRaisesRegex(OSError, "mudou durante"):
                 digest_file(path, expected)
 
@@ -256,7 +256,7 @@ class ScannerTests(unittest.TestCase):
         path = self.write_file("mudou.txt")
         expected = path.lstat()
 
-        with patch("rastro.scanner.os.fstat", side_effect=[expected, changed_stat(expected)]):
+        with patch("zelunexo.scanner.os.fstat", side_effect=[expected, changed_stat(expected)]):
             scan = scan_folder(self.root)
 
         self.assertEqual(scan["files"], [])

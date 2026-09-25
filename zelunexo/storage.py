@@ -46,7 +46,7 @@ def connect(path: Path, *, create: bool = False):
         version = connection.execute("PRAGMA user_version").fetchone()[0]
         if create:
             if version not in (0, 1):
-                raise ValueError("Versão de banco incompatível com este Rastro.")
+                raise ValueError("Versão de banco incompatível com este Zelunexo.")
             if (version == 1 and application_id != APPLICATION_ID) or (
                 version == 0 and application_id not in (0, APPLICATION_ID)
             ):
@@ -57,7 +57,7 @@ def connect(path: Path, *, create: bool = False):
                     raise ValueError("O arquivo SQLite pertence a outro aplicativo. Escolha outro --banco.")
                 connection.executescript(SCHEMA + f"PRAGMA application_id = {APPLICATION_ID}; PRAGMA user_version = 1;")
         elif version != 1 or application_id != APPLICATION_ID:
-            raise ValueError("Este arquivo não é um histórico compatível do Rastro.")
+            raise ValueError("Este arquivo não é um histórico compatível do Zelunexo.")
         yield connection
     finally:
         connection.close()

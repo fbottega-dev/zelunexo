@@ -3,7 +3,7 @@
 from html.parser import HTMLParser
 import unittest
 
-from rastro.report import format_size, render_html
+from zelunexo.report import format_size, render_html
 
 
 class Document(HTMLParser):

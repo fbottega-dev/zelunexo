@@ -2,7 +2,7 @@
 
 import unittest
 
-from rastro.domain import group_duplicates, summarize
+from zelunexo.domain import group_duplicates, summarize
 
 
 def file_record(path, size, digest):

@@ -143,12 +143,12 @@ def render_html(scan: dict) -> str:
     return f"""<!doctype html>
 <html lang="pt-BR">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="color-scheme" content="light"><meta name="description" content="Relatório local de arquivos duplicados, gerado pelo Rastro.">
-<title>Rastro — {folder}</title><style>{_CSS}</style></head>
+<meta name="color-scheme" content="light"><meta name="description" content="Relatório local de arquivos duplicados, gerado pelo Zelunexo.">
+<title>Zelunexo — {folder}</title><style>{_CSS}</style></head>
 <body>
 <a class="skip-link" href="#main">Pular para o relatório</a>
 <aside class="sidebar">
-  <a class="brand" href="#overview" aria-label="Rastro, início do relatório"><svg viewBox="0 0 36 36" aria-hidden="true"><path d="M8 26V10h9v16h11V10"/><path d="M8 18h20"/></svg><span>rastro<span class="brand-dot">.</span></span></a>
+  <a class="brand" href="#overview" aria-label="Zelunexo, início do relatório"><svg viewBox="0 0 36 36" aria-hidden="true"><path d="M8 26V10h9v16h11V10"/><path d="M8 18h20"/></svg><span>zelunexo<span class="brand-dot">.</span></span></a>
   <p class="brand-caption">Um olhar sobre seus arquivos.</p>
   <p class="nav-caption">SEU RELATÓRIO</p>
   <nav aria-label="Seções do relatório">
@@ -181,14 +181,14 @@ def render_html(scan: dict) -> str:
   </section>
   <section id="scope" class="scope-section" aria-labelledby="scope-title">
     <div class="section-heading"><div><p class="eyebrow">03 / CONTEXTO E CRITÉRIOS</p><h2 id="scope-title">Sobre a análise<span class="heading-dot">.</span></h2></div></div>
-    <div class="method-grid"><article><span class="method-number">01</span><h3>Conteúdo, além do nome</h3><p>Os grupos comparam tamanho e SHA-256. Arquivos vazios entram na contagem, mas não nos grupos.</p></article><article><span class="method-number">02</span><h3>Uma fotografia da pasta</h3><p>O relatório retrata a análise de {date}. Mudanças posteriores nos arquivos não aparecem aqui.</p></article><article><span class="method-number">03</span><h3>Decisões nas suas mãos</h3><p>O Rastro apenas analisa. Revise a finalidade de cada cópia antes de organizar seus arquivos.</p></article></div>
+    <div class="method-grid"><article><span class="method-number">01</span><h3>Conteúdo, além do nome</h3><p>Os grupos comparam tamanho e SHA-256. Arquivos vazios entram na contagem, mas não nos grupos.</p></article><article><span class="method-number">02</span><h3>Uma fotografia da pasta</h3><p>O relatório retrata a análise de {date}. Mudanças posteriores nos arquivos não aparecem aqui.</p></article><article><span class="method-number">03</span><h3>Decisões nas suas mãos</h3><p>O Zelunexo apenas analisa. Revise a finalidade de cada cópia antes de organizar seus arquivos.</p></article></div>
     <div class="scope-record"><div class="scope-record-heading"><h3>Registro da análise</h3><p>{_number(len(issues))} ocorrência(s) · {_number(len(skipped))} item(ns) ignorado(s)</p></div>{exceptions}</div>
   </section>
-  <footer class="report-footer"><span><strong>rastro.</strong> Clareza para organizar.</span><span>Relatório offline · Tamanhos em unidades binárias (1 KiB = 1.024 B)</span></footer>
+  <footer class="report-footer"><span><strong>zelunexo.</strong> Clareza para organizar.</span><span>Relatório offline · Tamanhos em unidades binárias (1 KiB = 1.024 B)</span></footer>
 </main><script>{_JS}</script></body></html>"""
 
 
-_CSS = files("rastro").joinpath("assets/report.css").read_text(encoding="utf-8")
+_CSS = files("zelunexo").joinpath("assets/report.css").read_text(encoding="utf-8")
 
 
-_JS = files("rastro").joinpath("assets/report.js").read_text(encoding="utf-8")
+_JS = files("zelunexo").joinpath("assets/report.js").read_text(encoding="utf-8")

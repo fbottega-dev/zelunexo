@@ -8,7 +8,7 @@ import sqlite3
 import tempfile
 import unittest
 
-from rastro.storage import connect, list_scans, load_scan, save_scan
+from zelunexo.storage import connect, list_scans, load_scan, save_scan
 
 
 def sample_scan():
@@ -32,7 +32,7 @@ class StorageTests(unittest.TestCase):
         self.temporary = tempfile.TemporaryDirectory()
         self.addCleanup(self.temporary.cleanup)
         self.directory = Path(self.temporary.name)
-        self.database = self.directory / "histórico 東京" / "rastro.sqlite3"
+        self.database = self.directory / "histórico 東京" / "zelunexo.sqlite3"
 
     def test_roundtrip_preserves_unicode_metadata_and_sorted_files(self):
         original = sample_scan()

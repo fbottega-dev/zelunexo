@@ -1,8 +1,8 @@
-# Decisões do Rastro
+# Decisões do Zelunexo
 
 ## Problema e escopo
 
-O Rastro ajuda a entender uma pasta antes de organizar arquivos: mostra tamanhos e grupos de conteúdo repetido, gera um relatório HTML e guarda o resultado no SQLite. A ferramenta não apaga nem move os arquivos analisados. A estimativa de duplicação serve para orientar uma revisão manual.
+O Zelunexo ajuda a entender uma pasta antes de organizar arquivos: mostra tamanhos e grupos de conteúdo repetido, gera um relatório HTML e guarda o resultado no SQLite. A ferramenta não apaga nem move os arquivos analisados. A estimativa de duplicação serve para orientar uma revisão manual.
 
 O código foi criado neste projeto, com apoio de IA, sem clonar uma aplicação pronta. A biblioteca padrão do Python fornece os componentes principais: `pathlib`/`os`, `hashlib`, `sqlite3`, `argparse`, `json` e `unittest`. Python 3.12 é a versão mínima.
 
@@ -26,7 +26,7 @@ Para um grupo de `n` cópias de `s` bytes, o potencial lógico é `(n - 1) × s`
 
 O SQLite guarda análises e arquivos em tabelas relacionadas. Ocorrências, caminhos pulados e padrões de exclusão ficam como listas JSON nos registros das análises. Essa escolha mantém os dados consultáveis sem exigir servidor de banco ou instalação de dependências.
 
-O cabeçalho `application_id` identifica o banco como Rastro e `user_version` registra a versão do esquema. A aplicação recusa um banco identificado como pertencente a outro programa. Cada análise é gravada em uma transação: se um arquivo falhar na gravação, a análise inteira é revertida. Consultas e exportações abrem o SQLite em modo somente leitura.
+O cabeçalho `application_id` identifica o banco como Zelunexo e `user_version` registra a versão do esquema. A aplicação recusa um banco identificado como pertencente a outro programa. Cada análise é gravada em uma transação: se um arquivo falhar na gravação, a análise inteira é revertida. Consultas e exportações abrem o SQLite em modo somente leitura.
 
 O banco e o relatório devem ficar fora da pasta analisada para que a ferramenta não leia as próprias saídas. O destino HTML é criado exclusivamente: um arquivo existente não é sobrescrito. O comando `exportar` usa os dados salvos e não precisa reler a pasta original.
 
@@ -36,7 +36,7 @@ Uma análise concluída devolve `0`; um erro de comando ou de execução impede 
 
 Uma CLI torna a execução reproduzível e fácil de integrar a scripts. O relatório HTML fornece uma visão visual que pode ser aberta sem iniciar um servidor. A ausência de exclusão automática mantém a decisão sobre os arquivos com a pessoa responsável por eles.
 
-O histórico contém nomes e caminhos de arquivos. Não deve ser publicado com informações pessoais. Uma demonstração deve usar a pasta fictícia criada por `python -m rastro demo`, não uma pasta pessoal.
+O histórico contém nomes e caminhos de arquivos. Não deve ser publicado com informações pessoais. Uma demonstração deve usar a pasta fictícia criada por `python -m zelunexo demo`, não uma pasta pessoal.
 
 ## Evoluções possíveis
 

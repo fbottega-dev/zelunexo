@@ -26,14 +26,14 @@ jobs:
       - name: Run behavior tests
         run: python -m unittest discover -s tests -v
       - name: Check Python compilation
-        run: python -m compileall -q rastro tests
+        run: python -m compileall -q zelunexo tests
       - name: Create sample files
-        run: python -m rastro demo ./ci-demo
+        run: python -m zelunexo demo ./ci-demo
       - name: Analyze sample files
-        run: python -m rastro analisar ./ci-demo --banco ./.rastro/historico.sqlite3 --html ./ci-relatorio.html
+        run: python -m zelunexo analisar ./ci-demo --banco ./.zelunexo/historico.sqlite3 --html ./ci-relatorio.html
       - name: Read saved history
-        run: python -m rastro historico --banco ./.rastro/historico.sqlite3
+        run: python -m zelunexo historico --banco ./.zelunexo/historico.sqlite3
       - name: Export saved analysis as HTML
-        run: python -m rastro exportar 1 --banco ./.rastro/historico.sqlite3 --saida ./ci-copia.html
+        run: python -m zelunexo exportar 1 --banco ./.zelunexo/historico.sqlite3 --saida ./ci-copia.html
       - name: Export saved analysis as JSON
-        run: python -m rastro exportar 1 --banco ./.rastro/historico.sqlite3 --saida ./ci-copia.json --formato json
+        run: python -m zelunexo exportar 1 --banco ./.zelunexo/historico.sqlite3 --saida ./ci-copia.json --formato json

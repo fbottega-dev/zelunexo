@@ -1,12 +1,12 @@
-# Rastro · arquivos duplicados
+# Zelunexo · arquivos duplicados
 
-[![Python CI](https://github.com/fbottega-dev/rastro-arquivos/actions/workflows/ci.yml/badge.svg)](https://github.com/fbottega-dev/rastro-arquivos/actions/workflows/ci.yml)
+[![Python CI](https://github.com/fbottega-dev/zelunexo/actions/workflows/ci.yml/badge.svg)](https://github.com/fbottega-dev/zelunexo/actions/workflows/ci.yml)
 
-Ferramenta local para estudantes e freelancers que acumulam cópias de trabalhos, entregas e referências. O Rastro analisa o **conteúdo** dos arquivos, mostra grupos duplicados e guarda cada análise para consulta posterior. Nenhum arquivo original é apagado ou movido.
+Ferramenta local para estudantes e freelancers que acumulam cópias de trabalhos, entregas e referências. O Zelunexo analisa o **conteúdo** dos arquivos, mostra grupos duplicados e guarda cada análise para consulta posterior. Nenhum arquivo original é apagado ou movido.
 
 Projeto criado do zero para estudo, com **Python, SQLite e biblioteca padrão**, sem partir de uma aplicação pronta. Código e documentação foram produzidos com apoio de IA e passaram por revisão e testes; isso não representa experiência profissional anterior.
 
-![Relatório gerado pelo Rastro com dados fictícios](docs/preview.jpg)
+![Relatório gerado pelo Zelunexo com dados fictícios](docs/preview.jpg)
 
 [Captura em celular](docs/mobile.jpg) · [HTML de exemplo para baixar e abrir](docs/demo.html) · [Guia para estudar o código](docs/ESTUDO.md)
 
@@ -17,10 +17,10 @@ Requisito: **Python 3.12 ou superior**, com `sqlite3` disponível. A distribuiç
 No PowerShell, Bash ou outro terminal:
 
 ```sh
-git clone https://github.com/fbottega-dev/rastro-arquivos.git
-cd rastro-arquivos
-python -m rastro demo ./demo
-python -m rastro analisar ./demo --html ./relatorio.html
+git clone https://github.com/fbottega-dev/zelunexo.git
+cd zelunexo
+python -m zelunexo demo ./demo
+python -m zelunexo analisar ./demo --html ./relatorio.html
 ```
 
 Abra `relatorio.html` no navegador. No Windows: `Start-Process ./relatorio.html`. Se o seu sistema usa `python3` ou `py -3.12`, substitua `python` nos comandos. Confirme a versão com `python --version`.
@@ -28,7 +28,7 @@ Abra `relatorio.html` no navegador. No Windows: `Start-Process ./relatorio.html`
 A demonstração cria 15 arquivos fictícios. A análise considera 14, ignora a pasta `.git` e encontra **4 grupos, 6 cópias excedentes e cerca de 1,8 MiB redundantes**. Há arquivos iguais com nomes diferentes, notas com conteúdos diferentes e um arquivo vazio.
 
 ```text
-Rastro · Análise #1 · concluída
+Zelunexo · Análise #1 · concluída
 14 arquivos lidos · 2.8 MiB
 4 grupos · 6 cópias excedentes · 1.8 MiB redundantes
 Estimativa de bytes lógicos. Nenhum arquivo original foi alterado.
@@ -51,10 +51,10 @@ O HTML contém seus próprios estilos e scripts, sem CDN, fontes remotas ou cole
 ## Usar em outra pasta
 
 ```sh
-python -m rastro analisar "./minha-pasta" --html ./relatorio-pasta.html --ignorar "*.tmp" --ignorar "backup/*"
-python -m rastro historico
-python -m rastro exportar 1 --saida ./copia.html
-python -m rastro exportar 1 --saida ./resultado.json --formato json
+python -m zelunexo analisar "./minha-pasta" --html ./relatorio-pasta.html --ignorar "*.tmp" --ignorar "backup/*"
+python -m zelunexo historico
+python -m zelunexo exportar 1 --saida ./copia.html
+python -m zelunexo exportar 1 --saida ./resultado.json --formato json
 ```
 
 Use o ID mostrado no histórico; `1` é apenas o exemplo da primeira análise. A exportação consulta o banco e funciona mesmo que a pasta original não exista mais. O JSON traz versão do formato, arquivos, grupos, resumo e ocorrências.
@@ -64,20 +64,20 @@ Por padrão, `.git`, `node_modules`, `.venv` e `__pycache__` são ignorados em q
 Veja todos os argumentos:
 
 ```sh
-python -m rastro --help
-python -m rastro analisar --help
+python -m zelunexo --help
+python -m zelunexo analisar --help
 ```
 
 ## Banco e arquivos de saída
 
-O banco padrão é `.rastro/historico.sqlite3`, relativo ao diretório em que o comando foi executado. O esquema é criado automaticamente na primeira análise. Não há configuração com credenciais, migrations externas ou seeder: `demo` cria os arquivos de exemplo e `analisar` popula o banco.
+O banco padrão é `.zelunexo/historico.sqlite3`, relativo ao diretório em que o comando foi executado. O esquema é criado automaticamente na primeira análise. Não há configuração com credenciais, migrations externas ou seeder: `demo` cria os arquivos de exemplo e `analisar` popula o banco.
 
 Para escolher outro histórico, passe `--banco` em cada comando:
 
 ```sh
-python -m rastro analisar ./demo --banco ./dados/historico.sqlite3 --html ./outro-relatorio.html
-python -m rastro historico --banco ./dados/historico.sqlite3
-python -m rastro exportar 1 --banco ./dados/historico.sqlite3 --saida ./outra-copia.html
+python -m zelunexo analisar ./demo --banco ./dados/historico.sqlite3 --html ./outro-relatorio.html
+python -m zelunexo historico --banco ./dados/historico.sqlite3
+python -m zelunexo exportar 1 --banco ./dados/historico.sqlite3 --saida ./outra-copia.html
 ```
 
 O diretório do banco é criado se necessário. O diretório do relatório deve existir. **O banco e o HTML de `analisar` precisam ficar fora da pasta analisada**, para preservar a origem e evitar analisar as próprias saídas. Para analisar o diretório atual, por exemplo, use `--banco ../historico.sqlite3 --html ../relatorio-atual.html`.
@@ -112,12 +112,12 @@ Se a exportação falhar depois da gravação, o terminal já informa o ID salvo
 
 ```sh
 python -m unittest discover -s tests -v
-python -m compileall -q rastro tests
+python -m compileall -q zelunexo tests
 ```
 
 A suíte cobre agrupamento, estimativa, exclusões, Unicode, hardlinks, links simbólicos, arquivos alterados durante leitura, permissões simuladas, transações, identificação do banco, proteção contra sobrescrita, conteúdo HTML malicioso e o fluxo completo dos comandos.
 
-O [GitHub Actions](https://github.com/fbottega-dev/rastro-arquivos/actions) executa a suíte e os comandos de demonstração em **Ubuntu e Windows, com Python 3.12, 3.13 e 3.14**. Testes que precisam criar links simbólicos são pulados quando o sistema nega esse privilégio; isso aparece no resultado. O registro da entrega e das verificações está em [VALIDACAO.md](docs/VALIDACAO.md).
+O [GitHub Actions](https://github.com/fbottega-dev/zelunexo/actions) executa a suíte e os comandos de demonstração em **Ubuntu e Windows, com Python 3.12, 3.13 e 3.14**. Testes que precisam criar links simbólicos são pulados quando o sistema nega esse privilégio; isso aparece no resultado. O registro da entrega e das verificações está em [VALIDACAO.md](docs/VALIDACAO.md).
 
 ## Por que estas tecnologias
 
@@ -127,13 +127,13 @@ SQLite persiste o histórico em um arquivo local; um servidor SQL seria desneces
 
 | Arquivo | Responsabilidade |
 | --- | --- |
-| `rastro/cli.py` | Argumentos, coordenação dos comandos e mensagens. |
-| `rastro/scanner.py` | Travessia, leitura e identificação dos arquivos. |
-| `rastro/domain.py` | Agrupamento e cálculo de bytes redundantes. |
-| `rastro/storage.py` | Esquema, transações e consultas SQLite. |
-| `rastro/report.py` | Transformação dos dados em HTML com escaping. |
-| `rastro/assets/` | Estilos e interações incorporados ao relatório. |
-| `rastro/demo.py` | Geração dos arquivos fictícios. |
+| `zelunexo/cli.py` | Argumentos, coordenação dos comandos e mensagens. |
+| `zelunexo/scanner.py` | Travessia, leitura e identificação dos arquivos. |
+| `zelunexo/domain.py` | Agrupamento e cálculo de bytes redundantes. |
+| `zelunexo/storage.py` | Esquema, transações e consultas SQLite. |
+| `zelunexo/report.py` | Transformação dos dados em HTML com escaping. |
+| `zelunexo/assets/` | Estilos e interações incorporados ao relatório. |
+| `zelunexo/demo.py` | Geração dos arquivos fictícios. |
 | `tests/` | Testes com pastas e bancos temporários. |
 
 Fundamentos e referências oficiais: [argparse](https://docs.python.org/3/library/argparse.html), [hashlib](https://docs.python.org/3/library/hashlib.html) e [sqlite3](https://docs.python.org/3/library/sqlite3.html). Siga o [guia de estudo](docs/ESTUDO.md) para acompanhar uma análise do comando até o relatório.
@@ -145,3 +145,9 @@ O resultado usa hashes, sem confirmação byte a byte. Os bytes são lógicos: n
 Todos os arquivos elegíveis são relidos em cada análise. Os metadados ficam em memória, então o projeto foi pensado para pastas pessoais, não milhões de arquivos. O histórico não compara versões automaticamente e o relatório não acompanha mudanças ao vivo. Não há classificação por similaridade de fotos ou documentos: só conteúdo idêntico por tamanho e hash.
 
 **Exercício sugerido:** adicionar `--minimo-bytes` para ocultar grupos pequenos no relatório, mantendo os totais da análise claramente separados dos totais filtrados. Comece por um teste de fronteira e depois altere domínio, comando e relatório. Veja [as decisões](docs/DECISOES.md) antes de ampliar o escopo.
+
+## Nome do projeto
+
+O projeto passou a se chamar **Zelunexo**. Na pesquisa realizada para a mudança, não foram encontrados resultados para o nome nas buscas exatas na web nem repositórios na busca do GitHub. Essa verificação não é registro de marca nem garantia permanente de exclusividade.
+
+Se você usou a versão anterior, os comandos agora começam com `python -m zelunexo`. Para consultar o histórico já criado, informe `--banco .rastro/historico.sqlite3`; novos históricos usam `.zelunexo/historico.sqlite3`. O formato do banco foi preservado.

@@ -1,15 +1,15 @@
-# Estudar e apresentar o Rastro
+# Estudar e apresentar o Zelunexo
 
 ## Executar um caso pequeno
 
 Na raiz do repositório, com Python 3.12 ou superior, execute os comandos abaixo. A pasta `demo` e os arquivos HTML devem ser destinos novos. O banco e as saídas ficam fora da pasta analisada.
 
 ```sh
-python -m rastro demo ./demo
-python -m rastro analisar ./demo --banco ./.rastro/historico.sqlite3 --html ./relatorio.html
-python -m rastro historico --banco ./.rastro/historico.sqlite3
-python -m rastro exportar 1 --banco ./.rastro/historico.sqlite3 --saida ./copia.html
-python -m rastro exportar 1 --banco ./.rastro/historico.sqlite3 --saida ./copia.json --formato json
+python -m zelunexo demo ./demo
+python -m zelunexo analisar ./demo --banco ./.zelunexo/historico.sqlite3 --html ./relatorio.html
+python -m zelunexo historico --banco ./.zelunexo/historico.sqlite3
+python -m zelunexo exportar 1 --banco ./.zelunexo/historico.sqlite3 --saida ./copia.html
+python -m zelunexo exportar 1 --banco ./.zelunexo/historico.sqlite3 --saida ./copia.json --formato json
 ```
 
 O ID `1` pressupõe um banco novo. Se já houver histórico, use o identificador mostrado pelo comando `historico`. Abra `relatorio.html` no navegador e compare os grupos apresentados com os arquivos fictícios da pasta.
@@ -17,12 +17,12 @@ O ID `1` pressupõe um banco novo. Se já houver histórico, use o identificador
 Para praticar exclusões, gere outra saída:
 
 ```sh
-python -m rastro analisar ./demo --banco ./.rastro/historico.sqlite3 --html ./relatorio-filtrado.html --ignorar "backup/*"
+python -m zelunexo analisar ./demo --banco ./.zelunexo/historico.sqlite3 --html ./relatorio-filtrado.html --ignorar "backup/*"
 ```
 
 ## Acompanhar o fluxo no código
 
-1. Comece pelo ponto de entrada `rastro/__main__.py`: veja como os argumentos chegam aos comandos.
+1. Comece pelo ponto de entrada `zelunexo/__main__.py`: veja como os argumentos chegam aos comandos.
 2. Localize a travessia da pasta e o cálculo de SHA-256. Entenda a diferença entre caminho, conteúdo, tamanho e identidade de um arquivo.
 3. Acompanhe o agrupamento por tamanho e hash e refaça o cálculo `(quantidade - 1) × tamanho` para um grupo do exemplo.
 4. Procure o código que grava e consulta o SQLite. Relacione uma análise com seus arquivos e com as ocorrências registradas.
@@ -45,7 +45,7 @@ Leia também [as decisões e limitações](DECISOES.md), especialmente hardlinks
 
 ```sh
 python -m unittest discover -s tests -v
-python -m compileall -q rastro tests
+python -m compileall -q zelunexo tests
 ```
 
 A configuração de CI executa os testes e um fluxo com dados fictícios em Windows e Ubuntu, usando Python 3.12, 3.13 e 3.14. A existência do workflow não comprova aprovação: confira o resultado da execução correspondente ao commit apresentado.
