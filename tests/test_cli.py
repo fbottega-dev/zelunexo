@@ -84,6 +84,54 @@ class CliTests(unittest.TestCase):
     def test_terminal_controls_are_escaped(self):
         self.assertEqual(terminal_text("ação\x1b[31m\n"), "ação\\u001b[31m\\u000a")
 
+    def test_failed_export_removes_partial_output_and_allows_retry(self):
+        self.call("demo", self.demo)
+        self.call("analisar", self.demo, "--banco", self.db)
+        output = self.root / "exportado.json"
+        original_open = Path.open
+
+        class FailingWriter:
+            def __enter__(self):
+                self.stream = original_open(output, "x", encoding="utf-8")
+                return self
+
+            def write(self, content):
+                self.stream.write(content[:20])
+                self.stream.flush()
+                raise OSError("Disco cheio (simulado)")
+
+            def __exit__(self, *args):
+                self.stream.close()
+
+        def open_with_failure(path, *args, **kwargs):
+            return FailingWriter() if path == output else original_open(path, *args, **kwargs)
+
+        with patch.object(Path, "open", open_with_failure):
+            code, _, errors = self.call("exportar", 1, "--banco", self.db,
+                                        "--saida", output, "--formato", "json")
+        self.assertEqual(code, 2)
+        self.assertIn("Disco cheio", errors)
+        self.assertFalse(output.exists(), "Uma exportação falha não deve bloquear a próxima tentativa")
+        self.assertEqual(self.call("exportar", 1, "--banco", self.db,
+                                  "--saida", output, "--formato", "json")[0], 0)
+        self.assertEqual(json.loads(output.read_text(encoding="utf-8"))["id"], 1)
+
+    def test_output_created_after_preflight_is_preserved(self):
+        self.call("demo", self.demo)
+        self.call("analisar", self.demo, "--banco", self.db)
+        output = self.root / "concorrente.json"
+        from zelunexo.cli import require_new_output
+
+        def competing_writer(path):
+            require_new_output(path)
+            path.write_text("Arquivo de outro processo", encoding="utf-8")
+
+        with patch("zelunexo.cli.require_new_output", side_effect=competing_writer):
+            code, _, _ = self.call("exportar", 1, "--banco", self.db,
+                                   "--saida", output, "--formato", "json")
+        self.assertEqual(code, 2)
+        self.assertEqual(output.read_text(encoding="utf-8"), "Arquivo de outro processo")
+
 
 if __name__ == "__main__":
     unittest.main()

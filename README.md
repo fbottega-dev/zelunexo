@@ -106,7 +106,7 @@ O histórico e os relatórios podem conter nomes pessoais de arquivos. Os dados 
 | `3` | Análise salva, mas parcial por ocorrências de leitura. |
 | `130` | Interrupção pelo teclado. |
 
-Se a exportação falhar depois da gravação, o terminal já informa o ID salvo; use `exportar` para tentar novamente. Uma falha ao salvar o banco reverte os registros daquela análise.
+Se a exportação falhar depois da gravação do histórico, o terminal já informa o ID salvo; use `exportar` para tentar novamente. Em erros de escrita ou interrupção pelo teclado, a saída incompleta criada pela tentativa é removida para permitir repetir o comando. Se o sistema impedir a remoção, o terminal informa o caminho. Uma falha ao salvar o banco reverte os registros daquela análise. Queda de energia ou encerramento forçado podem deixar uma saída incompleta.
 
 ## Testes
 

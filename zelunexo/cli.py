@@ -74,8 +74,20 @@ def write_export(scan: dict, path: Path, output_format: str) -> None:
             {"schema_version": 1, **scan, "summary": summarize(scan), "groups": group_duplicates(scan["files"])},
             ensure_ascii=False, indent=2,
         ) + "\n"
-    with path.open("x", encoding="utf-8", newline="\n") as stream:
-        stream.write(content)
+    created = False
+    try:
+        with path.open("x", encoding="utf-8", newline="\n") as stream:
+            created = True
+            stream.write(content)
+    except (OSError, UnicodeError, KeyboardInterrupt):
+        # A abertura exclusiva pode falhar porque outro processo criou a saída.
+        # Só limpamos uma saída que esta tentativa conseguiu criar.
+        if created:
+            try:
+                path.unlink(missing_ok=True)
+            except OSError:
+                print(f"A saída incompleta não pôde ser removida: {terminal_text(path)}.", file=sys.stderr)
+        raise
 
 
 def execute(args: argparse.Namespace) -> int:
