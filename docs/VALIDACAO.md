@@ -1,5 +1,13 @@
 # Verificações da entrega
 
+## Correções — 27/09/2026
+
+Foram reproduzidas e corrigidas duas falhas: o ponto de entrada do comando instalado não configurava UTF-8, e a criação inicial do banco podia deixar tabelas ou metadados incompletos após um erro.
+
+Três testes novos executam ambos os pontos de entrada em subprocessos com saída inicialmente ASCII, verificando ajuda, mensagens de erro e criação de demonstração em caminho com acentos. Outros três verificam rollback durante a criação do esquema e gravação da versão, nova tentativa após falha e compatibilidade com bancos da versão 1.
+
+Na suíte completa local, **65 testes descobertos: 63 aprovados e 2 pulados** pelo privilégio de links simbólicos do Windows. `compileall` e a verificação de whitespace passaram. As verificações remotas por commit permanecem disponíveis no Actions, no link ao final desta página.
+
 ## Execução local — 24/09/2026
 
 Windows, Python 3.12.14: 57 testes descobertos, **55 aprovados e 2 pulados**. Os dois casos pulados precisam criar links simbólicos, operação negada pelo Windows neste ambiente. Hardlink real e reparse point simulado foram verificados. `compileall` passou.

@@ -28,6 +28,8 @@ O SQLite guarda análises e arquivos em tabelas relacionadas. Ocorrências, cami
 
 O cabeçalho `application_id` identifica o banco como Zelunexo e `user_version` registra a versão do esquema. A aplicação recusa um banco identificado como pertencente a outro programa. Cada análise é gravada em uma transação: se um arquivo falhar na gravação, a análise inteira é revertida. Consultas e exportações abrem o SQLite em modo somente leitura.
 
+A criação inicial das tabelas e desses dois metadados também ocorre em uma única transação. Se falhar, o banco não fica com um esquema incompleto que bloqueie a próxima tentativa. Essa correção preserva a versão 1 e não recria tabelas de históricos existentes.
+
 O banco e o relatório devem ficar fora da pasta analisada para que a ferramenta não leia as próprias saídas. O destino HTML é criado exclusivamente: um arquivo existente não é sobrescrito. O comando `exportar` usa os dados salvos e não precisa reler a pasta original.
 
 Uma análise concluída devolve `0`; um erro de comando ou de execução impede a entrega normal e devolve `2`; ocorrências durante a leitura resultam em `3`. Scripts devem verificar o código de saída além de ler o relatório.

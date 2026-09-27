@@ -55,7 +55,13 @@ def connect(path: Path, *, create: bool = False):
                 existing = connection.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()
                 if existing:
                     raise ValueError("O arquivo SQLite pertence a outro aplicativo. Escolha outro --banco.")
-                connection.executescript(SCHEMA + f"PRAGMA application_id = {APPLICATION_ID}; PRAGMA user_version = 1;")
+                # executescript não abre uma transação: inclua o BEGIN no próprio
+                # script para reverter tabelas e metadados juntos se algo falhar.
+                with connection:
+                    connection.executescript(
+                        "BEGIN IMMEDIATE;\n" + SCHEMA
+                        + f"PRAGMA application_id = {APPLICATION_ID}; PRAGMA user_version = 1;"
+                    )
         elif version != 1 or application_id != APPLICATION_ID:
             raise ValueError("Este arquivo não é um histórico compatível do Zelunexo.")
         yield connection

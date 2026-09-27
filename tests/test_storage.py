@@ -7,8 +7,9 @@ from pathlib import Path
 import sqlite3
 import tempfile
 import unittest
+from unittest.mock import patch
 
-from zelunexo.storage import connect, list_scans, load_scan, save_scan
+from zelunexo.storage import APPLICATION_ID, SCHEMA, connect, list_scans, load_scan, save_scan
 
 
 def sample_scan():
@@ -88,6 +89,57 @@ class StorageTests(unittest.TestCase):
         self.assertEqual(list_scans(self.database), [])
         with connect(self.database) as connection:
             self.assertEqual(connection.execute("SELECT COUNT(*) FROM files").fetchone()[0], 0)
+
+    def test_failed_initialization_rolls_back_schema_and_allows_retry(self):
+        broken_schema = SCHEMA.replace("CREATE TABLE IF NOT EXISTS files", "INVALID SQL; CREATE TABLE IF NOT EXISTS files")
+
+        with patch("zelunexo.storage.SCHEMA", broken_schema), self.assertRaises(sqlite3.OperationalError):
+            save_scan(self.database, sample_scan())
+
+        with closing(sqlite3.connect(self.database)) as connection:
+            self.assertEqual(connection.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall(), [])
+            self.assertEqual(connection.execute("PRAGMA application_id").fetchone()[0], 0)
+            self.assertEqual(connection.execute("PRAGMA user_version").fetchone()[0], 0)
+
+        scan_id = save_scan(self.database, sample_scan())
+        self.assertEqual(load_scan(self.database, scan_id)["folder"], sample_scan()["folder"])
+        with connect(self.database) as connection:
+            self.assertEqual(connection.execute("PRAGMA application_id").fetchone()[0], APPLICATION_ID)
+            self.assertEqual(connection.execute("PRAGMA user_version").fetchone()[0], 1)
+
+    def test_existing_version_one_database_remains_writable_without_reinitialization(self):
+        self.database.parent.mkdir(parents=True)
+        with closing(sqlite3.connect(self.database)) as connection:
+            connection.executescript(SCHEMA + f"PRAGMA application_id = {APPLICATION_ID}; PRAGMA user_version = 1;")
+
+        with patch("zelunexo.storage.SCHEMA", "INVALID SQL;"):
+            scan_id = save_scan(self.database, sample_scan())
+
+        self.assertEqual(load_scan(self.database, scan_id)["folder"], sample_scan()["folder"])
+
+    def test_failed_version_write_rolls_back_schema_and_application_id(self):
+        sqlite_connect = sqlite3.connect
+
+        def deny_version_write(action, name, value, database, trigger):
+            if action == sqlite3.SQLITE_PRAGMA and name == "user_version" and value == "1":
+                return sqlite3.SQLITE_DENY
+            return sqlite3.SQLITE_OK
+
+        def connect_without_version_write(*args, **kwargs):
+            connection = sqlite_connect(*args, **kwargs)
+            connection.set_authorizer(deny_version_write)
+            return connection
+
+        with patch("zelunexo.storage.sqlite3.connect", side_effect=connect_without_version_write):
+            with self.assertRaises(sqlite3.DatabaseError):
+                save_scan(self.database, sample_scan())
+
+        with closing(sqlite3.connect(self.database)) as connection:
+            self.assertEqual(connection.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall(), [])
+            self.assertEqual(connection.execute("PRAGMA application_id").fetchone()[0], 0)
+            self.assertEqual(connection.execute("PRAGMA user_version").fetchone()[0], 0)
+
+        self.assertIsInstance(save_scan(self.database, sample_scan()), int)
 
     def test_reading_missing_history_does_not_create_database_or_parent(self):
         for reader in [list_scans, lambda path: load_scan(path, 1)]:
