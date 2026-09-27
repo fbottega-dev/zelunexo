@@ -141,6 +141,11 @@ def execute(args: argparse.Namespace) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
+    # O executável instalado e `python -m zelunexo` passam por este ponto.
+    # Configure antes do argparse: até --help contém caracteres acentuados.
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8", errors="backslashreplace")
     args = parser().parse_args(argv)
     try:
         return execute(args)
