@@ -37,3 +37,14 @@ jobs:
         run: python -m zelunexo exportar 1 --banco ./.zelunexo/historico.sqlite3 --saida ./ci-copia.html
       - name: Export saved analysis as JSON
         run: python -m zelunexo exportar 1 --banco ./.zelunexo/historico.sqlite3 --saida ./ci-copia.json --formato json
+      - name: Build installable package
+        run: python -m pip wheel --no-deps --wheel-dir dist .
+      - name: Verify isolated package installation
+        run: python scripts/check_package.py dist/zelunexo-1.1.0-py3-none-any.whl
+      - name: Upload verified package
+        if: matrix.os == 'ubuntu-latest' && matrix.python == '3.12'
+        uses: actions/upload-artifact@v4
+        with:
+          name: zelunexo-1.1.0
+          path: dist/*.whl
+          if-no-files-found: error

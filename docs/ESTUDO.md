@@ -41,6 +41,14 @@ python -m zelunexo analisar ./demo --banco ./.zelunexo/historico.sqlite3 --html 
 
 Leia também [as decisões e limitações](DECISOES.md), especialmente hardlinks, alterações durante a leitura e a diferença entre bytes lógicos e espaço físico.
 
+## Entender a instalação da versão 1.1.0
+
+O arquivo `pyproject.toml` descreve o pacote e registra o comando `zelunexo`, que chama `main` em `cli.py`. Um **wheel** (`.whl`) é o pacote de distribuição instalável: reúne os módulos, os estilos e o JavaScript do relatório. O ambiente virtual mantém essa instalação separada de outros projetos. Ele não substitui o banco; o histórico continua no caminho escolhido na execução.
+
+Leia `scripts/check_package.py`: o verificador cria um ambiente temporário, instala o wheel sem buscar dependências e executa o comando fora da pasta do código. Isso verifica uma situação diferente de rodar testes no checkout: um recurso esquecido no pacote poderia funcionar durante o desenvolvimento e faltar para quem instalou. As verificações temporárias usam dados fictícios e não acessam suas pastas pessoais.
+
+Para continuar praticando depois do fluxo principal, siga [as melhorias priorizadas e a rotina de commits](EVOLUCAO.md).
+
 ## Verificar o comportamento
 
 ```sh

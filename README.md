@@ -8,7 +8,9 @@ Projeto criado do zero para estudo, com **Python, SQLite e biblioteca padrão**,
 
 ![Relatório gerado pelo Zelunexo com dados fictícios](docs/preview.jpg)
 
-[Captura em celular](docs/mobile.jpg) · [HTML de exemplo para baixar e abrir](docs/demo.html) · [Guia para estudar o código](docs/ESTUDO.md)
+[Captura em celular](docs/mobile.jpg) · [HTML de exemplo para baixar e abrir](docs/demo.html) · [Guia para estudar o código](docs/ESTUDO.md) · [Próximas melhorias](docs/EVOLUCAO.md)
+
+**Versão 1.1.0:** escopo inicial concluído, com correções de exportação, exclusões e concorrência. Veja o [histórico de mudanças](CHANGELOG.md). As limitações estão descritas ao final deste README.
 
 ## Experimentar
 
@@ -35,6 +37,30 @@ Estimativa de bytes lógicos. Nenhum arquivo original foi alterado.
 ```
 
 A pasta `demo` precisa ser nova. Para analisar novamente, use outro nome de relatório, como `--html ./relatorio-2.html`. O mesmo banco acumula análises com IDs novos.
+
+## Instalar o comando no ambiente virtual
+
+A execução acima continua disponível sem instalação. Se preferir usar o comando `zelunexo`, crie um ambiente virtual na raiz do repositório.
+
+No Windows (PowerShell):
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install .
+.\.venv\Scripts\zelunexo.exe --version
+```
+
+No Linux/macOS:
+
+```sh
+python -m venv .venv
+./.venv/bin/python -m pip install .
+./.venv/bin/zelunexo --version
+```
+
+O `pip` pode baixar ferramentas de construção durante a instalação. O aplicativo instalado não possui dependências externas de execução. O comando instalado aceita os mesmos argumentos de `python -m zelunexo`; caminhos relativos de pasta, banco e relatório continuam relativos ao diretório atual.
+
+Também é possível baixar `zelunexo-1.1.0-py3-none-any.whl` na [versão 1.1.0](https://github.com/fbottega-dev/zelunexo/releases/tag/v1.1.0) e instalar usando o Python do ambiente virtual: `python -m pip install --no-index --no-deps /caminho/zelunexo-1.1.0-py3-none-any.whl`. O mesmo pacote fica no artefato `zelunexo-1.1.0` de uma execução aprovada do [Actions](https://github.com/fbottega-dev/zelunexo/actions). Ele contém o código, os estilos e os scripts do relatório. Não há publicação no PyPI nesta entrega.
 
 ## O que funciona
 
@@ -121,6 +147,13 @@ A suíte cobre agrupamento, estimativa, exclusões, Unicode, hardlinks, links si
 
 O [GitHub Actions](https://github.com/fbottega-dev/zelunexo/actions) executa a suíte e os comandos de demonstração em **Ubuntu e Windows, com Python 3.12, 3.13 e 3.14**. Testes que precisam criar links simbólicos são pulados quando o sistema nega esse privilégio; isso aparece no resultado. O registro da entrega e das verificações está em [VALIDACAO.md](docs/VALIDACAO.md).
 
+A CI também constrói o wheel e instala o pacote em um ambiente virtual temporário, fora da pasta do código. Essa verificação percorre demonstração, análise, histórico e exportação usando o executável instalado e confere a presença de CSS/JavaScript no relatório. Para reproduzir:
+
+```sh
+python -m pip wheel --no-deps --wheel-dir dist .
+python scripts/check_package.py dist/zelunexo-1.1.0-py3-none-any.whl
+```
+
 ## Por que estas tecnologias
 
 Python facilita automações de arquivos e oferece leitura em blocos, SHA-256, argumentos de terminal, SQLite e testes na própria biblioteca padrão. Ele também amplia um portfólio que já contém Java, C#, PHP e Kotlin.
@@ -147,6 +180,8 @@ O resultado usa hashes, sem confirmação byte a byte. Os bytes são lógicos: n
 Todos os arquivos elegíveis são relidos em cada análise. Os metadados ficam em memória, então o projeto foi pensado para pastas pessoais, não milhões de arquivos. O histórico não compara versões automaticamente e o relatório não acompanha mudanças ao vivo. Não há classificação por similaridade de fotos ou documentos: só conteúdo idêntico por tamanho e hash.
 
 **Exercício sugerido:** adicionar `--minimo-bytes` para ocultar grupos pequenos no relatório, mantendo os totais da análise claramente separados dos totais filtrados. Comece por um teste de fronteira e depois altere domínio, comando e relatório. Veja [as decisões](docs/DECISOES.md) antes de ampliar o escopo.
+
+O [roteiro de evolução](docs/EVOLUCAO.md) detalha esse exercício e as próximas prioridades: comparar duas análises salvas e oferecer confirmação opcional byte a byte. Cada proposta inclui benefício e critérios de aceite, além de uma rotina para reproduzir problemas, revisar alterações e publicar novos commits.
 
 ## Nome do projeto
 
