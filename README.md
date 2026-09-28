@@ -61,6 +61,8 @@ Use o ID mostrado no histórico; `1` é apenas o exemplo da primeira análise. A
 
 Por padrão, `.git`, `node_modules`, `.venv` e `__pycache__` são ignorados em qualquer nível. Um padrão sem `/` é comparado com cada componente do caminho; com `/`, com o caminho completo relativo à raiz. Use barras `/` mesmo no Windows. A comparação diferencia maiúsculas de minúsculas; `*.tmp` não exclui `ARQUIVO.TMP`. Esses padrões usam `fnmatch`, não a sintaxe completa de `.gitignore`.
 
+Uma barra final restringe a exclusão a **diretórios**: `--ignorar "backup/"` pula pastas chamadas `backup` em qualquer nível, mas mantém arquivos com esse nome. Para restringir à raiz, use um caminho como `--ignorar "projetos/cache/"`. O padrão `--ignorar "temp-*/"` aceita nomes variáveis de pastas. A barra final é removida antes de aplicar a regra de caminho relativo acima; links e junctions continuam ignorados pela política da análise.
+
 Veja todos os argumentos:
 
 ```sh

@@ -44,14 +44,21 @@ def digest_file(path: Path, expected: os.stat_result) -> str:
     return digest.hexdigest()
 
 
-def excluded(relative: str, patterns: list[str]) -> bool:
+def excluded(relative: str, patterns: list[str], *, is_directory: bool = False) -> bool:
     # Sem barra, o padrão vale para qualquer componente. Com barra, para o caminho relativo.
-    return any(
-        fnmatchcase(relative, pattern)
-        if "/" in pattern
-        else any(fnmatchcase(part, pattern) for part in relative.split("/"))
-        for pattern in patterns
-    )
+    for pattern in patterns:
+        if pattern.endswith("/"):
+            if not is_directory:
+                continue
+            pattern = pattern[:-1]
+        matches = (
+            fnmatchcase(relative, pattern)
+            if "/" in pattern
+            else any(fnmatchcase(part, pattern) for part in relative.split("/"))
+        )
+        if matches:
+            return True
+    return False
 
 
 def scan_folder(root: Path, excludes: list[str] | None = None) -> dict:
@@ -98,7 +105,10 @@ def scan_folder(root: Path, excludes: list[str] | None = None) -> dict:
                 if is_link(info):
                     result["skipped"].append({"path": relative, "reason": "Link ou junction"})
                 elif stat.S_ISDIR(info.st_mode):
-                    pending.append((path, info))
+                    if excluded(relative, patterns, is_directory=True):
+                        result["skipped"].append({"path": relative, "reason": "Padrão de exclusão"})
+                    else:
+                        pending.append((path, info))
                 elif stat.S_ISREG(info.st_mode):
                     identity = (info.st_dev, info.st_ino)
                     if info.st_ino and identity in identities:

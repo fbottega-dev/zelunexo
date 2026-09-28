@@ -121,6 +121,51 @@ class ScannerTests(unittest.TestCase):
             with self.subTest(pattern=pattern), self.assertRaises(ValueError):
                 scan_folder(self.root, [pattern])
 
+    def test_trailing_slash_excludes_only_directories_at_any_depth(self):
+        for relative in [
+            "backup/antigo.txt", "nested/backup/antigo.txt",
+            "arquivos/backup", "nested/normal.txt",
+        ]:
+            self.write_file(relative)
+
+        scan = scan_folder(self.root, ["backup/"])
+
+        self.assertEqual(scan["issues"], [])
+        self.assertEqual([file["path"] for file in scan["files"]], [
+            "arquivos/backup", "nested/normal.txt",
+        ])
+        self.assertEqual(scan["skipped"], [
+            {"path": "backup", "reason": "Padrão de exclusão"},
+            {"path": "nested/backup", "reason": "Padrão de exclusão"},
+        ])
+
+    def test_directory_exclusions_with_paths_are_relative_to_root(self):
+        for relative in [
+            "projetos/cache/temporario.txt", "outros/projetos/cache/manter.txt",
+            "projetos/cache.txt", "projetos/dados.txt",
+        ]:
+            self.write_file(relative)
+
+        scan = scan_folder(self.root, ["projetos/cache/"])
+
+        self.assertEqual(scan["issues"], [])
+        self.assertEqual([file["path"] for file in scan["files"]], [
+            "outros/projetos/cache/manter.txt", "projetos/cache.txt", "projetos/dados.txt",
+        ])
+        self.assertEqual(scan["skipped"], [
+            {"path": "projetos/cache", "reason": "Padrão de exclusão"},
+        ])
+
+    def test_directory_exclusions_preserve_glob_matching(self):
+        for relative in ["temp-01/item.txt", "nested/temp-02/item.txt", "arquivos/temp-03"]:
+            self.write_file(relative)
+
+        scan = scan_folder(self.root, ["temp-*/"])
+
+        self.assertEqual(scan["issues"], [])
+        self.assertEqual([file["path"] for file in scan["files"]], ["arquivos/temp-03"])
+        self.assertEqual([item["path"] for item in scan["skipped"]], ["nested/temp-02", "temp-01"])
+
     def test_file_is_not_accepted_as_root(self):
         path = self.write_file("arquivo.txt")
 
@@ -245,12 +290,13 @@ class ScannerTests(unittest.TestCase):
                 return reparse_info
             return original_lstat(current, *args, **kwargs)
 
-        with patch.object(Path, "lstat", controlled_lstat):
-            scan = scan_folder(self.root)
+        for patterns in ([], ["junction/"]):
+            with self.subTest(patterns=patterns), patch.object(Path, "lstat", controlled_lstat):
+                scan = scan_folder(self.root, patterns)
 
-        self.assertEqual(scan["files"], [])
-        self.assertEqual(scan["issues"], [])
-        self.assertEqual(scan["skipped"], [{"path": "junction", "reason": "Link ou junction"}])
+            self.assertEqual(scan["files"], [])
+            self.assertEqual(scan["issues"], [])
+            self.assertEqual(scan["skipped"], [{"path": "junction", "reason": "Link ou junction"}])
 
     def test_changed_file_during_read_becomes_issue_without_digest_record(self):
         path = self.write_file("mudou.txt")
