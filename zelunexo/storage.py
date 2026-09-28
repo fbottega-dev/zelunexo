@@ -42,28 +42,33 @@ def connect(path: Path, *, create: bool = False):
     try:
         connection.row_factory = sqlite3.Row
         connection.execute("PRAGMA foreign_keys = ON")
-        application_id = connection.execute("PRAGMA application_id").fetchone()[0]
-        version = connection.execute("PRAGMA user_version").fetchone()[0]
-        if create:
-            if version not in (0, 1):
-                raise ValueError("Versão de banco incompatível com este Zelunexo.")
-            if (version == 1 and application_id != APPLICATION_ID) or (
-                version == 0 and application_id not in (0, APPLICATION_ID)
-            ):
-                raise ValueError("O arquivo SQLite pertence a outro aplicativo. Escolha outro --banco.")
-            if version == 0:
-                existing = connection.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()
-                if existing:
+        with connection:
+            if create:
+                # Valide e inicialize sob o mesmo lock: outro criador não pode
+                # alterar os metadados entre as leituras e a criação das tabelas.
+                connection.execute("BEGIN IMMEDIATE")
+            application_id = connection.execute("PRAGMA application_id").fetchone()[0]
+            version = connection.execute("PRAGMA user_version").fetchone()[0]
+            if create:
+                if version not in (0, 1):
+                    raise ValueError("Versão de banco incompatível com este Zelunexo.")
+                if (version == 1 and application_id != APPLICATION_ID) or (
+                    version == 0 and application_id not in (0, APPLICATION_ID)
+                ):
                     raise ValueError("O arquivo SQLite pertence a outro aplicativo. Escolha outro --banco.")
-                # executescript não abre uma transação: inclua o BEGIN no próprio
-                # script para reverter tabelas e metadados juntos se algo falhar.
-                with connection:
-                    connection.executescript(
-                        "BEGIN IMMEDIATE;\n" + SCHEMA
-                        + f"PRAGMA application_id = {APPLICATION_ID}; PRAGMA user_version = 1;"
-                    )
-        elif version != 1 or application_id != APPLICATION_ID:
-            raise ValueError("Este arquivo não é um histórico compatível do Zelunexo.")
+                if version == 0:
+                    existing = connection.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()
+                    if existing:
+                        raise ValueError("O arquivo SQLite pertence a outro aplicativo. Escolha outro --banco.")
+                    # Este DDL estático só usa ';' como separador. executescript
+                    # confirmaria a transação atual, liberando o lock cedo demais.
+                    for statement in SCHEMA.split(";"):
+                        if statement.strip():
+                            connection.execute(statement)
+                    connection.execute(f"PRAGMA application_id = {APPLICATION_ID}")
+                    connection.execute("PRAGMA user_version = 1")
+            elif version != 1 or application_id != APPLICATION_ID:
+                raise ValueError("Este arquivo não é um histórico compatível do Zelunexo.")
         yield connection
     finally:
         connection.close()

@@ -30,6 +30,8 @@ O cabeçalho `application_id` identifica o banco como Zelunexo e `user_version` 
 
 A criação inicial das tabelas e desses dois metadados também ocorre em uma única transação. Se falhar, o banco não fica com um esquema incompleto que bloqueie a próxima tentativa. Essa correção preserva a versão 1 e não recria tabelas de históricos existentes.
 
+Ao abrir o banco para gravação, `BEGIN IMMEDIATE` obtém o bloqueio antes de ler os metadados. Assim, duas análises iniciadas juntas não confundem etapas diferentes da inicialização com um banco de outro aplicativo. Uma segunda conexão aguarda até cinco segundos pelo bloqueio; se o prazo acabar, o comando informa o erro e pode ser repetido. O DDL estático é executado por instrução para manter o bloqueio durante toda a validação e criação.
+
 O banco e o relatório devem ficar fora da pasta analisada para que a ferramenta não leia as próprias saídas. O destino HTML é criado exclusivamente: um arquivo existente não é sobrescrito. O comando `exportar` usa os dados salvos e não precisa reler a pasta original.
 
 Uma análise concluída devolve `0`; um erro de comando ou de execução impede a entrega normal e devolve `2`; ocorrências durante a leitura resultam em `3`. Scripts devem verificar o código de saída além de ler o relatório.

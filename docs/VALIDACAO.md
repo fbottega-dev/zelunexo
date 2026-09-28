@@ -1,5 +1,13 @@
 # Verificações da entrega
 
+## Validação de IDs, exclusões e concorrência — 27/09/2026
+
+Esta rodada acrescentou seis testes: dois para limites do ID usado em `exportar`, três para padrões de exclusão com barra final e um para a disputa entre duas conexões durante a inicialização do histórico. A cobertura de junctions também foi executada com um padrão de diretório.
+
+Antes das correções, um ID acima do limite do SQLite gerava `OverflowError`, `backup/` não excluía a pasta e a gravação concorrente podia produzir uma falsa rejeição de banco estrangeiro. Os testes reproduziram esses comportamentos e passaram após as mudanças. A disputa de conexões é provocada em um ponto conhecido da leitura, sem depender de temporizadores; também é verificada a nova tentativa após liberação do bloqueio.
+
+Resultado local: **71 testes descobertos, 69 aprovados e 2 pulados** pela restrição de criação de links simbólicos no Windows. Compilação com `compileall` e revisão de whitespace passaram. Os commits têm execuções próprias no Actions.
+
 ## Correções — 27/09/2026
 
 Foram reproduzidas e corrigidas duas falhas: o ponto de entrada do comando instalado não configurava UTF-8, e a criação inicial do banco podia deixar tabelas ou metadados incompletos após um erro.

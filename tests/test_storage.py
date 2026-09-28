@@ -117,6 +117,42 @@ class StorageTests(unittest.TestCase):
 
         self.assertEqual(load_scan(self.database, scan_id)["folder"], sample_scan()["folder"])
 
+    def test_concurrent_initialization_cannot_mix_database_metadata(self):
+        sqlite_connect = sqlite3.connect
+        competing_errors = []
+        attempted = False
+        first_connection = True
+        database = self.database
+
+        class InterleavedConnection(sqlite3.Connection):
+            def execute(self, sql, parameters=()):
+                nonlocal attempted
+                # Outro escritor chega entre as leituras dos metadados. Timeout
+                # zero torna a disputa determinística, sem esperas artificiais.
+                if sql == "PRAGMA user_version" and not attempted:
+                    attempted = True
+                    try:
+                        save_scan(database, sample_scan())
+                    except sqlite3.OperationalError as error:
+                        competing_errors.append(str(error))
+                return super().execute(sql, parameters)
+
+        def interleaved_connect(*args, **kwargs):
+            nonlocal first_connection
+            kwargs["timeout"] = 0
+            if first_connection:
+                first_connection = False
+                kwargs["factory"] = InterleavedConnection
+            return sqlite_connect(*args, **kwargs)
+
+        with patch("zelunexo.storage.sqlite3.connect", side_effect=interleaved_connect):
+            first_id = save_scan(self.database, sample_scan())
+
+        self.assertEqual(competing_errors, ["database is locked"])
+        second_id = save_scan(self.database, sample_scan())
+        self.assertNotEqual(first_id, second_id)
+        self.assertEqual(len(list_scans(self.database)), 2)
+
     def test_failed_version_write_rolls_back_schema_and_application_id(self):
         sqlite_connect = sqlite3.connect
 
