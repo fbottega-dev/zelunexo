@@ -134,6 +134,9 @@ def execute(args: argparse.Namespace) -> int:
             print(f"#{scan['id']} · {terminal_text(scan['created_at'])} · {terminal_text(scan['folder'])} · {state}")
             print(f"  {scan['scanned_files']} arquivos | {scan['duplicate_groups']} grupos | {format_bytes(scan['potential_bytes'])} redundantes")
         return 0
+    # SQLite armazena IDs como inteiros assinados de 64 bits.
+    if not 1 <= args.id <= 2**63 - 1:
+        raise ValueError("O ID deve estar entre 1 e 9223372036854775807. Consulte historico para escolher uma análise.")
     scan = load_scan(args.banco, args.id)
     write_export(scan, args.saida, args.formato)
     print(f"Análise #{scan['id']} exportada para {terminal_text(args.saida)}.")
